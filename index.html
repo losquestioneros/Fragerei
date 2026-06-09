@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fragerei</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@300;400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink:    #1a1a2e;
+      --paper:  #ffffff;
+      --warm:   #f0f0f5;
+      --thread: #6c63ff;
+      --accent: #ff6b6b;
+      --muted:  #a0a0b8;
+      --radius: 12px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: 'Inter', sans-serif;
+      font-weight: 300;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    header {
+      padding: 2rem 2rem 1.5rem;
+      border-bottom: 1px solid var(--warm);
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+      border-top: 4px solid var(--thread);
+    }
+
+    .logo {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+    }
+
+    .week-tag {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem 1.5rem;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .eyebrow {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--thread);
+      margin-bottom: 1.25rem;
+    }
+
+    .question {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: clamp(1.45rem, 4vw, 2rem);
+      line-height: 1.5;
+      font-weight: 400;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+      min-height: 80px;
+    }
+
+    .question.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .question-number {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-top: 1rem;
+    }
+
+    .divider {
+      margin: 2.5rem 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--warm) 20%, var(--warm) 80%, transparent);
+    }
+
+    .reflection-label {
+      font-size: 0.75rem;
+      font-weight: 500;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+
+    textarea {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--warm);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 300;
+      color: var(--ink);
+      resize: vertical;
+      min-height: 120px;
+      line-height: 1.7;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    textarea::placeholder { color: var(--muted); }
+    textarea:focus { border-color: var(--thread); }
+
+    .actions {
+      margin-top: 1.25rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      border-radius: var(--radius);
+      padding: 0.65rem 1.25rem;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--thread), var(--accent));
+      color: #fff;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+
+    .btn-ghost {
+      background: transparent;
+      color: var(--thread);
+      border: 1px solid var(--warm);
+    }
+    .btn-ghost:hover { border-color: var(--thread); }
+
+    .share-row {
+      margin-top: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .share-text {
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .share-link {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--thread);
+      background: var(--warm);
+      padding: 0.35rem 0.8rem;
+      border-radius: 99px;
+      cursor: pointer;
+      border: none;
+      font-family: 'Inter', sans-serif;
+      transition: background 0.2s;
+    }
+    .share-link:hover { background: #ddd3c5; }
+
+    footer {
+      padding: 1.5rem 2rem;
+      border-top: 1px solid var(--warm);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .footer-left, .footer-right {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--ink);
+      color: var(--paper);
+      padding: 0.65rem 1.4rem;
+      border-radius: 99px;
+      font-size: 0.8rem;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      white-space: nowrap;
+    }
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    @media (max-width: 480px) {
+      header { padding: 1.25rem 1.25rem 1rem; }
+      main   { padding: 2rem 1.25rem; }
+      footer { padding: 1rem 1.25rem; }
+    }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <header>
+    <span class="logo">Fragerei</span>
+    <span class="week-tag" id="weekLabel">Woche lädt…</span>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="eyebrow">Deine Frage dieser Woche</div>
+
+      <p class="question" id="question"></p>
+      <p class="question-number" id="questionNumber"></p>
+
+      <div class="divider"></div>
+
+      <div class="reflection-label">Deine Gedanken (nur für dich)</div>
+      <textarea id="reflection" placeholder="Was löst diese Frage in dir aus? Schreib einfach drauflos…"></textarea>
+
+      <div class="actions">
+        <button class="btn-primary" onclick="saveReflection()">Gedanken speichern</button>
+        <button class="btn-ghost" onclick="shareQuestion()">Frage teilen</button>
+      </div>
+
+      <div class="share-row">
+        <span class="share-text">Jemanden einladen, dieselbe Frage zu bekommen:</span>
+        <button class="share-link" onclick="copyLink()">Link kopieren</button>
+      </div>
+    </div>
+  </main>
+
+  <footer>
+    <span class="footer-left">Gegen Einsamkeit. Für echte Begegnung.</span>
+    <span class="footer-right">Eine neue Frage erscheint jeden Montag.</span>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── EURE FRAGEN – hier einfach neue hinzufügen oder bestehende ändern ──
+  const FRAGEN = [
+    "Weles Gfühl fühlsch am meiste?",
+    "Was möcht ich hüt vo Herze gern erläbe?",
+    "Weli Frag möchtisch vo Herze gern vo mir gstellt becho?",
+    "Wele Gedanke dänksch am meiste?",
+    "Wie führsch du dich selbst?",
+    "Was dänksch du, wele Gedanke dänk ich am meiste?",
+    "Was heisst für dich Loyalität?",
+    "What's the source of creativity?",
+    "Weli Frag stellsch du vo Herze gern dim Gägenüber, wenn dir die Person wichtig isch?",
+    "Wenn fühlsch du dich würklich bi dir – und wie fühlt sich das ah?",
+  ];
+
+  // ── Wochennummer berechnen ──────────────────────────────────────
+  function getWeekNumber() {
+    const now   = new Date();
+    const start = new Date(now.getFullYear(), 0, 1);
+    const diff  = now - start + (start.getTimezoneOffset() - now.getTimezoneOffset()) * 60000;
+    return Math.floor(diff / 604800000);
+  }
+
+  const week  = getWeekNumber();
+  const year  = new Date().getFullYear();
+  const index = week % FRAGEN.length;   // rotiert automatisch durch alle Fragen
+  const frage = FRAGEN[index];
+
+  // ── Wochenlabel ────────────────────────────────────────────────
+  document.getElementById('weekLabel').textContent = `Woche ${week} · ${year}`;
+
+  // ── Frage einblenden ───────────────────────────────────────────
+  window.addEventListener('load', () => {
+    const qEl = document.getElementById('question');
+    const nEl = document.getElementById('questionNumber');
+    qEl.textContent = frage;
+    nEl.textContent = `Frage ${index + 1} von ${FRAGEN.length}`;
+    requestAnimationFrame(() => qEl.classList.add('visible'));
+
+    // Gespeicherte Reflexion laden
+    try {
+      const saved = localStorage.getItem(`tg_refl_${year}_w${week}`);
+      if (saved) document.getElementById('reflection').value = saved;
+    } catch {}
+  });
+
+  // ── Toast ──────────────────────────────────────────────────────
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2400);
+  }
+
+  // ── Reflexion speichern ────────────────────────────────────────
+  function saveReflection() {
+    const text = document.getElementById('reflection').value.trim();
+    if (!text) { showToast('Noch nichts geschrieben…'); return; }
+    try { localStorage.setItem(`tg_refl_${year}_w${week}`, text); } catch {}
+    showToast('Gespeichert ✓');
+  }
+
+  // ── Frage teilen ───────────────────────────────────────────────
+  function shareQuestion() {
+    if (navigator.share) {
+      navigator.share({ title: 'Fragerei', text: frage, url: window.location.href });
+    } else {
+      navigator.clipboard.writeText(frage).then(() => showToast('Frage kopiert ✓'));
+    }
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => showToast('Link kopiert – teile ihn mit jemandem ✓'))
+      .catch(() => showToast('Kopieren leider nicht möglich'));
+  }
+</script>
+</body>
+</html>
