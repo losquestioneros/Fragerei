@@ -101,40 +101,43 @@
     /* Comic-Sprechblase für die Frage */
     .bubble {
       position: relative;
-      background: #ffffff;
-      border: 3.5px solid #1a1a2e;
+      /* Farbverlauf-Rand: innen weiss, Randfläche im Fragerei-Gradient */
+      border: 3.5px solid transparent;
       border-radius: 10px;
+      background:
+        linear-gradient(#ffffff, #ffffff) padding-box,
+        linear-gradient(135deg, var(--thread), var(--accent)) border-box;
       padding: 1.4rem 1.5rem;
       transform: rotate(-1.5deg);
-      box-shadow: 5px 6px 0 #1a1a2e;
+      box-shadow: 5px 6px 0 rgba(108, 99, 255, 0.35);
       margin-bottom: 2.2rem;
       opacity: 0;
       transition: opacity 0.7s ease, transform 0.7s ease;
     }
     .bubble.visible { opacity: 1; transform: rotate(-1.5deg) translateY(0); }
 
-    /* Sprechblasen-Zipfel unten links (mit schwarzem Rand) */
+    /* Sprechblasen-Zipfel unten links — im Farbverlauf */
     .bubble::after {
       content: '';
       position: absolute;
-      bottom: -24px;
-      left: 42px;
-      width: 0; height: 0;
-      border-left: 10px solid transparent;
-      border-right: 16px solid transparent;
-      border-top: 26px solid #1a1a2e;
-      transform: rotate(8deg);
+      bottom: -23px;
+      left: 40px;
+      width: 30px;
+      height: 27px;
+      background: linear-gradient(135deg, var(--thread), var(--accent));
+      clip-path: polygon(0 0, 100% 0, 32% 100%);
+      transform: rotate(6deg);
     }
     .bubble::before {
       content: '';
       position: absolute;
-      bottom: -15px;
-      left: 46px;
-      width: 0; height: 0;
-      border-left: 7px solid transparent;
-      border-right: 12px solid transparent;
-      border-top: 19px solid #ffffff;
-      transform: rotate(8deg);
+      bottom: -14px;
+      left: 45px;
+      width: 21px;
+      height: 19px;
+      background: #ffffff;
+      clip-path: polygon(0 0, 100% 0, 32% 100%);
+      transform: rotate(6deg);
       z-index: 1;
     }
 
@@ -145,6 +148,10 @@
       font-weight: 600;
       min-height: 60px;
       transform: rotate(1.5deg); /* Text gerade trotz schiefer Bubble */
+      background: linear-gradient(135deg, var(--thread), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     /* Hinweis unter der Frage */
@@ -724,7 +731,7 @@
 
     try {
       // ── EURE FORMSPREE-ID HIER EINTRAGEN (z.B. xpwzabcd) ──
-      const FORMSPREE_ID = 'xdavdjnp';
+      const FORMSPREE_ID = 'EURE_ID_HIER';
 
       const res = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
         method: 'POST',
