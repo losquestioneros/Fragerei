@@ -3,16 +3,16 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Fragerei — Eine Frage pro Woche für echte Gespräche</title>
+<title>Fragerei – Für Gespräche, die bewegen und verbinden</title>
 <link rel="manifest" href="/manifest.json" />
 <meta name="theme-color" content="#0d0420">
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black">
 <meta name="apple-mobile-web-app-title" content="Fragerei" />
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-<meta name="description" content="Jede Woche eine Frage, die Gespräche öffnet — mit Freunden, der Familie oder Fremden im Tram. Ein Herzensprojekt aus Winterthur für echte Begegnung." />
-<meta property="og:title" content="Fragerei — Eine Frage pro Woche" />
-<meta property="og:description" content="Für Gespräche, die hängenbleiben. Hol dir deine Frage der Woche." />
+<meta name="description" content="Für Gespräche, die bewegen und verbinden: Jede Woche eine Frage – mit Freunden, der Familie oder Fremden im Tram. Ein Herzensprojekt aus Winterthur für echte Begegnung." />
+<meta property="og:title" content="Fragerei – Für Gespräche, die bewegen und verbinden" />
+<meta property="og:description" content="Hol dir deine Frage der Woche und stell sie jemandem – im Tram, am Znachttisch, zwischen Tür und Angel." />
 <meta property="og:image" content="https://fragen.fragerei.ch/icon-512.png" />
 <meta property="og:url" content="https://fragen.fragerei.ch" />
 <meta property="og:type" content="website" />
@@ -232,7 +232,8 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .lg-bob{animation:lgBob 4.4s ease-in-out infinite}
 @keyframes lgBeam{0%,100%{opacity:.78}50%{opacity:1}}
 @keyframes lgBob{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
-.claim{flex:1 1 15rem;min-width:0;color:var(--ink-3);font-size:.95rem}
+.claim{flex:1 1 15rem;min-width:0;color:var(--ink-3);font-family:var(--f-lbl);font-size:.64rem;letter-spacing:.22em;text-transform:uppercase;text-wrap:balance}
+.claim-br{display:none}
 
 .page{max-width:40rem;margin-inline:auto;padding-block:0 72px;display:flex;flex-direction:column;gap:68px}
 
@@ -452,6 +453,9 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .live .toast{bottom:calc(28px + env(safe-area-inset-bottom,0px))}
 
 @media (max-width:600px){
+  .top{flex-direction:column;align-items:center;text-align:center;gap:10px}
+  .claim{flex:none}
+  .claim-br{display:inline}
   .switcher{left:16px;right:16px;transform:none;width:auto;max-width:none}
   .page{gap:56px}
 }
@@ -529,7 +533,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
       </g>
     </svg>
   </span>
-  <span class="claim">Eine Frage pro Woche. Für Gespräche, die hängenbleiben.</span>
+  <span class="claim">Für Gespräche,<br class="claim-br"> die bewegen und verbinden.</span>
 </header>
 
 <main class="page">

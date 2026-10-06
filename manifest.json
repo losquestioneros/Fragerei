@@ -1,7 +1,7 @@
 {
-  "name": "Fragerei – Eine Frage pro Woche",
+  "name": "Fragerei – Für Gespräche, die bewegen und verbinden",
   "short_name": "Fragerei",
-  "description": "Für Gespräche, die hängenbleiben. Hol dir deine Frage der Woche.",
+  "description": "Hol dir deine Frage der Woche und stell sie jemandem – im Tram, am Znachttisch, zwischen Tür und Angel.",
   "lang": "de-CH",
   "start_url": "/",
   "scope": "/",
