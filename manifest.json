@@ -1,0 +1,16 @@
+{
+  "name": "Fragerei – Eine Frage pro Woche",
+  "short_name": "Fragerei",
+  "description": "Für Gespräche, die hängenbleiben. Hol dir deine Frage der Woche.",
+  "lang": "de-CH",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#0d0420",
+  "theme_color": "#0d0420",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
