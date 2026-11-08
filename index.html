@@ -21,7 +21,7 @@
 <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Manrope:wght@400..700&family=Space+Grotesk:wght@400..700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Manrope:wght@400..700&family=Space+Grotesk:wght@400..700&family=Courier+Prime&display=swap">
 <script>window.FRAGEREI_LIVE = true;</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" defer></script>
 <style>[hidden]{display:none!important}</style>
@@ -338,10 +338,33 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .kc-toggle button{appearance:none;border:0;background:transparent;color:var(--chrome-dim);font:600 .64rem/1 var(--f-ui);letter-spacing:.12em;text-transform:uppercase;padding:8px 13px;border-radius:999px;cursor:pointer}
 .kc-toggle button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--chrome-ink)}
 
-.nichts{position:relative;z-index:1;max-width:36rem;margin-inline:auto;padding-block:140vh 0;display:flex;flex-direction:column;gap:40vh;text-align:center}
-.n-line{margin:0;color:var(--void-ink);font-family:var(--f-body);font-size:clamp(1.15rem,1rem + .8vw,1.5rem);line-height:1.45;text-wrap:balance}
+.nichts{position:relative;z-index:1;padding-top:140vh;height:630vh}
+.n-stage{position:sticky;top:0;height:100vh;height:100svh;display:grid;place-items:center;overflow:hidden;pointer-events:none}
+.n-line{grid-area:1/1;max-width:min(34rem,calc(100vw - 32px));margin:0;color:var(--void-ink);font-family:var(--f-body);font-size:clamp(1.15rem,1rem + .8vw,1.5rem);line-height:1.45;text-wrap:balance;text-align:center;opacity:0;will-change:transform,opacity}
 .n-title{font-family:var(--f-disp);font-size:clamp(1.6rem,1.2rem + 2vw,2.4rem);font-style:var(--h-style);font-weight:var(--h-wt);font-variation-settings:var(--h-var);text-transform:var(--h-tt)}
-.abyss{height:110vh}
+.abyss{height:90vh}
+
+/* the end: a small white circle grows until everything is light */
+.licht{position:relative;z-index:2;height:640vh;margin-inline:-16px}
+.l-stage{position:sticky;top:0;height:100vh;height:100svh;display:grid;place-items:center;overflow:hidden}
+.l-circle{grid-area:1/1;width:100%;height:100%;--r:6px;background:radial-gradient(circle at 50% 50%,#fff 0,#fff var(--r),rgba(255,255,255,.45) calc(var(--r) + 1px),rgba(255,255,255,.12) calc(var(--r) * 1.3 + 14px),rgba(255,255,255,0) calc(var(--r) * 1.7 + 40px));opacity:0}
+.l-title{margin:0;font-family:var(--f-disp);font-weight:var(--h-wt);font-style:var(--h-style);font-variation-settings:var(--h-var);font-size:clamp(3rem,2rem + 6vw,6.5rem);line-height:1;color:#fff;text-shadow:0 2px 4px rgba(50,50,75,.14),0 8px 26px rgba(50,50,75,.16)}
+.l-sub{margin:0;max-width:30rem;font-family:var(--f-body);font-size:clamp(1rem,.9rem + .5vw,1.25rem);line-height:1.5;color:#fff;text-wrap:balance;font-weight:600;text-shadow:0 1px 2px rgba(40,40,65,.34),0 2px 10px rgba(40,40,65,.26)}
+:root[data-v="2c"] .l-title,:root[data-v="5b"] .l-title{font-stretch:125%}
+.l-top,.l-bottom{position:absolute;left:16px;right:16px;margin:0 auto;text-align:center;opacity:0}
+.l-top{top:calc(7vh + env(safe-area-inset-top,0px))}
+.l-bottom{bottom:calc(8vh + env(safe-area-inset-bottom,0px))}
+:root:not(.live) .l-bottom{bottom:calc(8vh + 84px + env(safe-area-inset-bottom,0px))}
+.l-brand{grid-area:1/1;margin:0;font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:min(12rem,22vw);letter-spacing:-.02em;line-height:1;color:#fff;text-shadow:0 3px 6px rgba(50,50,75,.12),0 14px 40px rgba(50,50,75,.16);opacity:0}
+.l-end{grid-area:1/1;padding-inline:16px;text-align:center;text-wrap:balance;font-size:clamp(2.4rem,1.6rem + 5vw,5.5rem);opacity:0}
+
+/* question of the week, following along at the top once scrolled past */
+.qtop{position:fixed;z-index:6;top:0;left:0;right:0;box-sizing:border-box;margin:0;padding:calc(10px + env(safe-area-inset-top,0px)) 16px 26px;background:linear-gradient(to bottom,rgba(6,3,16,.86),rgba(6,3,16,.6) 55%,rgba(6,3,16,0));font-family:"Courier Prime","Courier New",ui-monospace,monospace;font-size:.8rem;line-height:1.4;letter-spacing:.01em;text-transform:lowercase;text-align:center;color:var(--ink-3);opacity:0;transform:translateY(-8px);pointer-events:none;transition:opacity .6s ease,transform .6s ease;text-shadow:0 1px 10px rgba(0,0,0,.65)}
+.qtop #qtopText{display:inline;max-width:36rem}
+.qtop.show{opacity:1;transform:none}
+.qtop-caret{display:inline-block;width:0;height:1em;margin-left:2px;vertical-align:-.15em;border-left:1px solid currentColor;animation:qtopCaret 1s steps(1) infinite}
+.qtop.done .qtop-caret{animation:none;opacity:0;transition:opacity 1.2s 1.6s}
+@keyframes qtopCaret{50%{border-left-color:transparent}}
 
 /* black hole: KOH • CHI → Über uns */
 .in-hole,.in-hole body{overflow:hidden}
@@ -461,7 +484,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 }
 @media (prefers-reduced-motion:reduce){
   .btn,.sw,.toast{transition:none}
-  .lg-beam,.lg-bob,.cue i::after,.kc-float,.kc-flag,.kc-glow,.kc-pulse,.qcard.pop,.bh::before,.hole-disk,.ufo-wobble,.ufo-light,.rocket-flame{animation:none}
+  .lg-beam,.lg-bob,.cue i::after,.kc-float,.kc-flag,.kc-glow,.kc-pulse,.qcard.pop,.bh::before,.hole-disk,.qtop-caret,.ufo-wobble,.ufo-light,.rocket-flame{animation:none}
 }
 </style>
 <script>
@@ -483,6 +506,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 <canvas class="sky" id="stars" aria-hidden="true"></canvas>
 <div id="fade" aria-hidden="true"></div>
 <div class="bh" id="bh" aria-hidden="true"></div>
+<p class="qtop" id="qtop" aria-hidden="true"><span id="qtopText"></span><i class="qtop-caret"></i></p>
 
 <header class="top">
   <span class="logo" id="logo" role="img" aria-label="Fragerei">
@@ -792,6 +816,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 <div class="void" id="void2" aria-hidden="true"></div>
 
 <section class="nichts" id="nichts" aria-label="Das Nichts">
+  <div class="n-stage">
   <p class="n-line n-title">Das Nichts.</p>
   <p class="n-line">Kennst du es? Die Weite, das Nichts. Den ewigen Raum – in dir.</p>
   <p class="n-line">Was geschieht, wenn du dich mit der Leere in dir befreundest?</p>
@@ -801,8 +826,19 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   <p class="n-line">Wo spürst du dein Interesse, diesen ewigen Raum in dir zu erkunden – die Weite, die Leere, die Stille kennen zu lernen?</p>
   <p class="n-line">Was passiert, wenn du dich fallen lässt – in dich hinein, in deine innere Umarmung?</p>
   <p class="n-line n-title">Das Nichts. Im All.</p>
+  </div>
 </section>
 <div class="abyss" id="abyss" aria-hidden="true"></div>
+<section class="licht" id="licht" aria-label="Alles">
+  <div class="l-stage">
+    <div class="l-circle" id="lCircle" aria-hidden="true"></div>
+    <p class="l-title l-top" id="lAlles">Alles.</p>
+    <p class="l-sub l-bottom" id="lDark">Dunkelheit ist die Abwesenheit vom Licht.</p>
+    <p class="l-brand" id="lBrand">Fragerei</p>
+    <p class="l-sub l-bottom" id="lLight">Wir alle sind das Licht.</p>
+    <p class="l-title l-end" id="lEnd">Lass uns leuchten.</p>
+  </div>
+</section>
 
 <section class="hole" id="hole" aria-labelledby="holeTitle" hidden>
   <div class="hole-disk" aria-hidden="true"></div>
@@ -996,12 +1032,8 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   STYLES['1b'] = STYLES[1];
   STYLES['5b'] = STYLES[5];
 
-  // three star layers in a wrapping tile: near layers drift faster (parallax) and the whole sky slowly turns
-  const LAYERS = [
-    { dens: 230, max: 5000, size: [.5, 1.05], alpha: [.22, .62], rot: .00005, speed: .05, drift: .0007, tw: .35 },
-    { dens: 80, max: 2000, size: [.9, 1.6], alpha: [.4, .85], rot: .00008, speed: .12, drift: .0009, tw: .45 },
-    { dens: 22, max: 600, size: [1.3, 2.4], alpha: [.65, 1], rot: .00012, speed: .24, drift: .0012, tw: .55 },
-  ];
+  // stars sit in a box in front of the camera; scrolling flies straight ahead through it
+  const STAR_DEPTH = 1700;
   const CRATERS = [[-.3, -.25, .16], [.25, .1, .12], [-.05, .38, .1], [.35, -.35, .07], [-.45, .15, .08]];
   // the big moon's near side: maria (dark plains) and a few craters, as [x, y, radius] in moon radii
   const MARIA = [[-.3, -.32, .27], [.1, -.34, .16], [.3, -.1, .19], [.36, .17, .12], [-.46, .06, .29], [-.14, .3, .17], [.04, .04, .11]];
@@ -1059,7 +1091,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   orbEls.forEach(el => { el._side = +el.dataset.side || 1; });
   const nLines = Array.from(document.querySelectorAll('.n-line'));
   const footEl = document.querySelector('.foot');
-  const zoneEls = { void1: document.getElementById('void1'), kohchi: document.getElementById('kohchi'), void2: document.getElementById('void2'), nichts: document.getElementById('nichts') };
+  const zoneEls = { void1: document.getElementById('void1'), kohchi: document.getElementById('kohchi'), void2: document.getElementById('void2'), nichts: document.getElementById('nichts'), licht: document.getElementById('licht') };
   const abyssEl = document.getElementById('abyss');
   const crewEl = document.getElementById('kcCrew');
   const sealEl = document.getElementById('kcSeal');
@@ -1077,10 +1109,15 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   let sy = window.scrollY, raf = 0;
   const t0 = performance.now();
   let style = STYLES[1], styleId = '1', tintCss = [], sprites = [];
-  let layers = [], segs = [];
-  const gen = { W: 0, S: 0 };
+  let stars = [];
+  const gen = { W: 0, H: 0 };
+  let VPX = 0, VPY = 0, FOCAL = 1, prevSy = window.scrollY; // vanishing point and lens of the forward flight
+  let vortex = null, vortexE = 0; // black hole pull: 0 = calm, 1 = everything swallowed
+  let GA = 1, P = { sc: 1, ox: 0, oy: 0 }; // alpha and projection of the body group being drawn
   let backKey = '';
-  const zones = { contentEnd: 1, abyss: 1, void1: { top: 0, h: 1 }, kohchi: { top: 0, h: 1 }, void2: { top: 0, h: 1 }, nichts: { top: 0, h: 1 } };
+  const zones = { contentEnd: 1, abyss: 1, nichtsPad: 0, void1: { top: 0, h: 1 }, kohchi: { top: 0, h: 1 }, void2: { top: 0, h: 1 }, nichts: { top: 0, h: 1 }, licht: { top: 0, h: 1 } };
+  const lCircle = document.getElementById('lCircle');
+  const lEls = { alles: document.getElementById('lAlles'), dark: document.getElementById('lDark'), brand: document.getElementById('lBrand'), light: document.getElementById('lLight'), end: document.getElementById('lEnd') };
   const hits = [];
   const pings = []; // first taps on two-tap bodies
   let mx = -1, my = -1, overUI = false, hoverId = null;
@@ -1127,45 +1164,21 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     requestDraw();
   }
 
-  function generate(S) {
+  function generate() {
     const rand = mulberry(20261004);
-    layers = LAYERS.map(L => {
-      const n = Math.min(Math.round(L.dens * S * S / 1e6), L.max);
-      const list = [];
-      for (let i = 0; i < n; i++) {
-        const u = rand();
-        list.push({
-          x0: rand() * S, y0: rand() * S,
-          s: L.size[0] + rand() * (L.size[1] - L.size[0]),
-          a: L.alpha[0] + rand() * (L.alpha[1] - L.alpha[0]),
-          f: .5 + rand() * 1.9, p: rand() * TAU,
-          c: u < .72 ? 0 : u < .9 ? 1 : 2,
-        });
-      }
-      list.sort((A, B) => A.c - B.c);
-      return { list, xs: new Float32Array(n), ys: new Float32Array(n) };
-    });
-    // constellation chains between bright stars
-    const L2 = layers[2].list, used = new Uint8Array(L2.length), D2 = 200 * 200;
-    segs = [];
-    for (let i = 0; i < L2.length; i++) {
-      if (used[i] || rand() > .3) continue;
-      used[i] = 1;
-      let cur = i;
-      const len = 2 + Math.floor(rand() * 4);
-      for (let k = 0; k < len; k++) {
-        let best = -1, bd = D2;
-        for (let j = 0; j < L2.length; j++) {
-          if (used[j]) continue;
-          const dx = L2[j].x0 - L2[cur].x0, dy = L2[j].y0 - L2[cur].y0, d = dx * dx + dy * dy;
-          if (d < bd && d > 1600) { bd = d; best = j; }
-        }
-        if (best < 0) break;
-        segs.push(cur, best);
-        used[best] = 1;
-        cur = best;
-      }
+    const n = Math.round(clamp(W * H / 550, 900, 3000));
+    // spread them over the far end of the view, so every star enters visibly and streams outward
+    const sx = (W / 2 + 40) * STAR_DEPTH / FOCAL, syy = (Math.max(VPY, H - VPY) + 40) * STAR_DEPTH / FOCAL;
+    stars = [];
+    for (let i = 0; i < n; i++) {
+      const u = rand();
+      stars.push({
+        x: (rand() * 2 - 1) * sx, y: (rand() * 2 - 1) * syy, z: 1 + rand() * STAR_DEPTH,
+        s: .55 + Math.pow(rand(), 3) * 1.9, a: .4 + rand() * .6,
+        f: .5 + rand() * 1.9, p: rand() * TAU, c: u < .72 ? 0 : u < .9 ? 1 : 2,
+      });
     }
+    stars.sort((A, B) => A.c - B.c);
   }
 
   function docTop(el) {
@@ -1180,9 +1193,8 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     for (const k in zoneEls) zones[k] = { top: docTop(zoneEls[k]), h: zoneEls[k].offsetHeight };
     zones.abyss = docTop(abyssEl);
     orbEls.forEach(el => { el._top = docTop(el); });
-    nLines.forEach(el => { el._top = docTop(el); });
-    const S = Math.ceil(Math.hypot(W, H) + 80);
-    if (W !== gen.W || S > gen.S) { gen.W = W; gen.S = S; generate(S); }
+    zones.nichtsPad = parseFloat(getComputedStyle(zoneEls.nichts).paddingTop) || 0;
+    if (W !== gen.W || Math.abs(H - gen.H) > 150) { gen.W = W; gen.H = H; generate(); }
     backKey = '';
     requestDraw();
   }
@@ -1195,6 +1207,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     cv.height = Math.round(H * DPR);
     bgc.width = Math.max(1, Math.ceil(W * BS));
     bgc.height = Math.max(1, Math.ceil(H * BS));
+    VPX = W / 2; VPY = H * .42; FOCAL = Math.min(W, H) * .55;
     measure();
   }
 
@@ -1209,34 +1222,35 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     g.addColorStop(0, S.bg[0]); g.addColorStop(.55, S.bg[1]); g.addColorStop(1, S.bg[2]);
     bctx.fillStyle = g;
     bctx.fillRect(0, 0, W, H);
-    for (const n of S.neb) {
-      // nebulae drift up and wrap around while fully out of view
-      const rr = n.r * Math.max(W, H), P = H + 2 * rr;
-      let cy = (n.y * H + rr - sy * n.k * .35) % P;
-      if (cy < 0) cy += P;
-      cy -= rr;
-      const cx = n.x * W;
-      const gr = bctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
-      gr.addColorStop(0, `rgba(${n.c},${n.a})`);
-      gr.addColorStop(.45, `rgba(${n.c},${n.a * .45})`);
-      gr.addColorStop(1, `rgba(${n.c},0)`);
-      bctx.fillStyle = gr;
-      bctx.fillRect(0, 0, W, H);
+    for (let i = 0; i < S.neb.length; i++) {
+      const n = S.neb[i];
+      // two copies half a cycle apart: each grows out of the distance and fades as it passes
+      for (const shift of [0, .5]) {
+        const ph = (((sy * .00012 * (.6 + n.k) + i * .37 + shift) % 1) + 1) % 1;
+        const g = .45 + ph * 1.5, fade = Math.sin(Math.PI * ph), al = n.a * fade * .85;
+        const cx = VPX + (n.x * W - VPX) * g, cy = VPY + (n.y * H - VPY) * g, rr = n.r * Math.max(W, H) * g * .85;
+        const gr = bctx.createRadialGradient(cx, cy, 0, cx, cy, rr);
+        gr.addColorStop(0, `rgba(${n.c},${al})`);
+        gr.addColorStop(.45, `rgba(${n.c},${al * .45})`);
+        gr.addColorStop(1, `rgba(${n.c},0)`);
+        bctx.fillStyle = gr;
+        bctx.fillRect(0, 0, W, H);
+      }
     }
   }
 
-  function drawBright(x, y, st) {
+  function drawBright(x, y, st, size) {
     const S = style;
-    const g = st.s * (S.l2 === 'dot' ? 4 : 7);
+    const g = size * (S.l2 === 'dot' ? 4 : 7);
     ctx.drawImage(sprites[st.c], x - g / 2, y - g / 2, g, g);
     if (S.l2 === 'cross') {
       ctx.fillStyle = tintCss[st.c];
-      const L = st.s * 3.2;
+      const L = size * 3.2;
       ctx.fillRect(x - L, y - .4, 2 * L, .8);
       ctx.fillRect(x - .4, y - L, .8, 2 * L);
-    } else if (S.l2 === 'sparkle' && st.s > 1.8) {
+    } else if (S.l2 === 'sparkle' && size > 1.8) {
       ctx.fillStyle = tintCss[st.c];
-      const L = st.s * 3.6;
+      const L = size * 3.6;
       ctx.beginPath();
       ctx.moveTo(x, y - L);
       ctx.quadraticCurveTo(x, y, x + L, y);
@@ -1430,16 +1444,16 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 
   function drawGalaxy(cx, cy, R, g) {
     const ct = Math.cos(.5), st = Math.sin(.5), core = R * .5;
-    ctx.globalAlpha = .55;
+    ctx.globalAlpha = .55 * GA;
     ctx.drawImage(sprites[1], cx - core, cy - core, core * 2, core * 2);
     let last = -1;
     for (const pt of galaxyPts) {
       const a = pt.th + g, px = pt.r * R * Math.cos(a), py = pt.r * R * Math.sin(a) * .42;
       if (pt.c !== last) { ctx.fillStyle = tintCss[pt.c]; last = pt.c; }
-      ctx.globalAlpha = pt.a;
+      ctx.globalAlpha = pt.a * GA;
       ctx.fillRect(cx + px * ct - py * st, cy + px * st + py * ct, pt.s, pt.s);
     }
-    ctx.globalAlpha = 1;
+    ctx.globalAlpha = GA;
   }
 
   function drawEclipse(x, y, r, glow) {
@@ -1447,7 +1461,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     if (S.mode === 'wire') {
       ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.fillStyle = `rgba(${S.shade},.96)`; ctx.fill();
       ctx.strokeStyle = S.hud; ctx.lineWidth = 1; ctx.stroke();
-      ctx.save(); ctx.setLineDash([2, 4]); ctx.globalAlpha = glow;
+      ctx.save(); ctx.setLineDash([2, 4]); ctx.globalAlpha = glow * GA;
       ctx.beginPath(); ctx.arc(x, y, r * 1.6, 0, TAU); ctx.stroke(); ctx.restore();
       return;
     }
@@ -1554,26 +1568,114 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     lines.forEach((t, i) => ctx.fillText(t, bx + dir * 26, by + i * 14));
   }
 
+  // How big a body appears while we fly towards it: 1 at its moment (off = 0), smaller while it is
+  // still far ahead, growing until we pass it. D is how far ahead it starts.
+  function approach(off, D) {
+    const z = D - off;
+    return z > 1 ? D / z : Infinity;
+  }
+  function baseTransform() {
+    ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+    if (vortexE > 0) { // the black hole pulls everything into the centre, turning
+      ctx.translate(W / 2, H / 2); ctx.rotate(vortexE * 2.2); ctx.scale(1 - vortexE, 1 - vortexE); ctx.translate(-W / 2, -H / 2);
+    }
+  }
+  // draw a group in its own coordinates, projected towards the vanishing point; fades in from afar and out as we pass
+  function begin(g) {
+    const sc = g.sc;
+    if (!(sc > 0) || sc === Infinity) return false;
+    const a = smooth(clamp((sc - .4) / .35, 0, 1)) * (1 - smooth(clamp((sc - 2.1) / 1.4, 0, 1)));
+    if (a <= .01) return false;
+    const ox = VPX * (1 - sc), oy = VPY * (1 - sc), R = (g.R || 80) * sc;
+    const cx = g.x * sc + ox, cy = g.y * sc + oy;
+    if (cx + R < -40 || cx - R > W + 40 || cy + R < -40 || cy - R > H + 40) return false;
+    P = { sc, ox, oy };
+    baseTransform();
+    ctx.transform(sc, 0, 0, sc, ox, oy);
+    GA = a; ctx.globalAlpha = a;
+    return true;
+  }
+  function end() {
+    GA = 1; ctx.globalAlpha = 1; P = { sc: 1, ox: 0, oy: 0 };
+    baseTransform();
+  }
   function addHit(id, x, y, r) {
-    if (x > -r && x < W + r && y > -r && y < H + r) hits.push({ id, x, y, r: Math.max(r, 12) + 8 });
+    if (GA < .35) return; // too faint to tap
+    const hx = x * P.sc + P.ox, hy = y * P.sc + P.oy, hr = r * P.sc;
+    if (hx > -hr && hx < W + hr && hy > -hr && hy < H + hr) hits.push({ id, x: hx, y: hy, r: Math.max(hr, 12) + 8 });
+  }
+
+  function drawDeep(b, off, u, la, tm) {
+    const S = style, r = b.r * u;
+    let x = W * b.x;
+    const y = H * (b.y != null ? b.y : (b.x < .5 ? .64 : .3));
+    if (b.kind === 'comet') x += off * .55;
+    if (b.kind === 'bigmoon') {
+      // swings in from the right along its orbit while we approach it
+      const Rx = Math.max(W * .45, 220), Ry = clamp(H * .14, 70, 130);
+      const t = clamp((P.sc - .3) / .7, 0, 1), e = 1 - Math.pow(1 - t, 3), th = (1 - e) * 1.6;
+      const qx = x + Rx * Math.sin(th), qy = y - Ry * (1 - Math.cos(th));
+      const mr = clamp(Math.min(W, H) * .1, 46, 92) * (.72 + .28 * (1 + Math.cos(th)) / 2);
+      orbit(x, y - Ry, Rx, Ry, 0, 0, TAU);
+      drawBigMoon(qx, qy, mr, .68 + .16 * smooth(clamp((off + H) / (H * 3), 0, 1)));
+      addHit(b.id, qx, qy, mr);
+      if (S.labels) hud(qx, qy, mr + 14, ['MOND', 'Ø 3474 KM']);
+    } else if (b.kind === 'ringed') {
+      if (S.ring) ring({ x, y, r }, false);
+      sphere(x, y, r, la, S.planets[1], { bands: true, tilt: .2, spin: tm * .1 + sy * .002 });
+      if (S.ring) ring({ x, y, r }, true);
+      addHit(b.id, x, y, r);
+    } else if (b.kind === 'moon') {
+      const a = sy * .006 + tm * .12, rx = r * 2.3, ry = r * .55, t = .3;
+      const lx = rx * Math.cos(a), ly = ry * Math.sin(a);
+      const qx = x + lx * Math.cos(t) - ly * Math.sin(t), qy = y + lx * Math.sin(t) + ly * Math.cos(t);
+      const qr = r * .32, front = Math.sin(a) > 0;
+      orbit(x, y, rx, ry, t, 0, TAU);
+      if (!front) sphere(qx, qy, qr, la, S.moon, { craters: true });
+      sphere(x, y, r, la, S.planets[0], { spin: tm * .2 });
+      if (front) sphere(qx, qy, qr, la, S.moon, { craters: true });
+      addHit(b.id, x, y, r);
+      addHit('twinMoon', qx, qy, qr);
+    } else if (b.kind === 'plain') {
+      sphere(x, y, r, la, S.far, { spin: tm * .2 });
+      addHit(b.id, x, y, r);
+    } else if (b.kind === 'comet') {
+      drawComet(x, y, r, b.k, u);
+      addHit(b.id, x, y, r * 2);
+    } else if (b.kind === 'binary') {
+      const a = sy * .005 + tm * .4, d = 14 * u;
+      drawStar(x + Math.cos(a) * d, y + Math.sin(a) * d * .6, 22 * u, S.sun);
+      drawStar(x - Math.cos(a) * d, y - Math.sin(a) * d * .6, 16 * u, S.tints[2]);
+      addHit(b.id, x, y, 22 * u);
+    } else if (b.kind === 'galaxy') {
+      drawGalaxy(x, y, r, sy * .0005 + tm * .03);
+      addHit(b.id, x, y, r * .55);
+    } else if (b.kind === 'eclipse') {
+      const beat = b.beat && tm ? Math.pow(Math.max(0, Math.sin(tm * 2.4)), 8) : 0;
+      drawEclipse(x, y, r * (1 + beat * .06), .75 + beat * .25);
+      addHit(b.id, x, y, r * 1.4);
+    } else if (b.kind === 'pulsar') {
+      drawPulsar(x, y, r, tm, u);
+      addHit(b.id, x, y, r * 3);
+    }
   }
 
   function drawBodies(tm) {
     const S = style, m = W < 700;
-    const p = sy / Math.max(H, zones.contentEnd - H);
     const u = clamp(Math.min(W, H) / 900, .5, 1.25);
     hits.length = 0;
+    const gr = clamp(Math.min(W, H) * .085, 26, 88) * (S.giantScale || 1);
+    const gx0 = m ? W - gr * .5 : Math.min(W - gr * .6, Math.max(W * .83, W / 2 + 330 + gr));
+    const sun = { x: W * (m ? .1 : .14), y: H * (m ? .86 : .8) };
+    const giant = { x: gx0, y: H * .27, r: gr };
+    const far = { x: W * (m ? .78 : .74), y: H * .72, r: 6 + 7 * u };
+    const angTo = b => Math.atan2(sun.y - b.y, sun.x - b.x);
+    const os = (S.orbitScale || 1) * u * (m ? .8 : 1);
+    const groups = [];
 
-    if (p < 2.6) {
-      const sun = { x: W * (m ? .1 : .14) + p * W * .03, y: H * (m ? .9 : .84) - p * H * .62 };
-      const gr = clamp(Math.min(W, H) * .085, 26, 88) * (S.giantScale || 1);
-      const gx0 = m ? W - gr * .5 : Math.min(W - gr * .6, Math.max(W * .83, W / 2 + 330 + gr));
-      const giant = { x: gx0 - p * W * .03, y: H * .25 - p * H * .5, r: gr };
-      const far = { x: W * (m ? .78 : .74), y: H * 1.2 - p * H * .6, r: 6 + 7 * u };
-      const angTo = b => Math.atan2(sun.y - b.y, sun.x - b.x);
-
-      // two planets circling a small distant sun
-      const os = (S.orbitScale || 1) * u * (m ? .8 : 1), st = -.32, cs = Math.cos(st), sn = Math.sin(st);
+    // a small distant sun with two planets
+    groups.push({ sc: approach(sy - 500, 1700), x: sun.x, y: sun.y, R: 170 * os, draw() {
+      const st = -.32, cs = Math.cos(st), sn = Math.sin(st);
       const orbs = [
         { id: 'p1', rx: 92 * os, a: sy * .0055 + tm * .06 + .8, r: 6.5 * u, c: S.planets[0] },
         { id: 'p2', rx: 160 * os, a: sy * .0033 + tm * .035 + 2.6, r: 10 * u, c: S.planets[1] },
@@ -1591,11 +1693,16 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
       for (const o of orbs) if (o.front) sphere(o.x, o.y, o.r, angTo(o), o.c, { spin: tm * .3 });
       addHit('sun', sun.x, sun.y, 10 * u);
       for (const o of orbs) addHit(o.id, o.x, o.y, o.r);
+      if (S.labels) hud(sun.x, sun.y, 18, ['S-2  STERN', 'BAHN  ' + deg(orbs[1].a) + '°']);
+    } });
 
+    groups.push({ sc: approach(sy - 1100, 1500), x: far.x, y: far.y, R: far.r * 3, draw() {
       sphere(far.x, far.y, far.r, angTo(far), S.far, { spin: tm * .2 });
       addHit('far', far.x, far.y, far.r);
+    } });
 
-      // giant planet with its moon
+    // the giant planet with its moon, right there when the page opens
+    groups.push({ sc: approach(sy, 1500), x: giant.x, y: giant.y, R: gr * 2.6, draw() {
       const mt = -.22, mrx = gr * 2.45, mry = gr * .62, ma = sy * .0032 + tm * .045 + 1.1;
       const mlx = mrx * Math.cos(ma), mly = mry * Math.sin(ma);
       const moon = { x: giant.x + mlx * Math.cos(mt) - mly * Math.sin(mt), y: giant.y + mlx * Math.sin(mt) + mly * Math.cos(mt) };
@@ -1614,72 +1721,21 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
       if (front) sphere(moon.x, moon.y, mr, angTo(moon), S.moon, moonOpts);
       addHit('giant', giant.x, giant.y, gr);
       addHit('moon', moon.x, moon.y, mr);
+      if (S.labels) hud(giant.x, giant.y, gr + 14, ['G-1  GASRIESE', 'MOND  ' + deg(ma) + '°']);
+    } });
 
-      if (S.labels) {
-        hud(giant.x, giant.y, gr + 14, ['G-1  GASRIESE', 'MOND  ' + deg(ma) + '°']);
-        hud(sun.x, sun.y, 18, ['S-2  STERN', 'BAHN  ' + deg(orbs[1].a) + '°']);
-      }
-    }
-
-    // bodies in the long universe below
+    // the long universe below the content
     const la = -2.4;
     for (const b of DEEP) {
       const z = zones[b.zone];
-      const off = sy - (z.top + b.f * z.h);
-      const r = b.r * u;
-      let x = W * b.x;
-      const y = H / 2 - off * b.k;
-      if (b.kind === 'comet') x += off * .55;
-      if (y < -r * 4 - 160 || y > H + r * 4 + 160) continue;
-      if (b.kind === 'bigmoon') {
-        // comes in from the right along its orbit and settles at the orbit's front point
-        const Rx = Math.max(W * .45, 220), Ry = clamp(H * .14, 70, 130);
-        const t = clamp((H * 1.02 - y) / (H * .6), 0, 1), e = 1 - Math.pow(1 - t, 3), th = (1 - e) * 1.6;
-        const qx = x + Rx * Math.sin(th), qy = y - Ry * (1 - Math.cos(th));
-        const mr = clamp(Math.min(W, H) * .1, 46, 92) * (.72 + .28 * (1 + Math.cos(th)) / 2);
-        orbit(x, y - Ry, Rx, Ry, 0, 0, TAU);
-        drawBigMoon(qx, qy, mr, .68 + .16 * smooth(clamp((off + H) / (H * 3), 0, 1)));
-        addHit(b.id, qx, qy, mr);
-        if (S.labels) hud(qx, qy, mr + 14, ['MOND', 'Ø 3474 KM']);
-      } else if (b.kind === 'ringed') {
-        if (S.ring) ring({ x, y, r }, false);
-        sphere(x, y, r, la, S.planets[1], { bands: true, tilt: .2, spin: tm * .1 + sy * .002 });
-        if (S.ring) ring({ x, y, r }, true);
-        addHit(b.id, x, y, r);
-      } else if (b.kind === 'moon') {
-        const a = sy * .006 + tm * .12, rx = r * 2.3, ry = r * .55, t = .3;
-        const lx = rx * Math.cos(a), ly = ry * Math.sin(a);
-        const qx = x + lx * Math.cos(t) - ly * Math.sin(t), qy = y + lx * Math.sin(t) + ly * Math.cos(t);
-        const qr = r * .32, front = Math.sin(a) > 0;
-        orbit(x, y, rx, ry, t, 0, TAU);
-        if (!front) sphere(qx, qy, qr, la, S.moon, { craters: true });
-        sphere(x, y, r, la, S.planets[0], { spin: tm * .2 });
-        if (front) sphere(qx, qy, qr, la, S.moon, { craters: true });
-        addHit(b.id, x, y, r);
-        addHit('twinMoon', qx, qy, qr);
-      } else if (b.kind === 'plain') {
-        sphere(x, y, r, la, S.far, { spin: tm * .2 });
-        addHit(b.id, x, y, r);
-      } else if (b.kind === 'comet') {
-        drawComet(x, y, r, b.k, u);
-        addHit(b.id, x, y, r * 2);
-      } else if (b.kind === 'binary') {
-        const a = sy * .005 + tm * .4, d = 14 * u;
-        drawStar(x + Math.cos(a) * d, y + Math.sin(a) * d * .6, 22 * u, S.sun);
-        drawStar(x - Math.cos(a) * d, y - Math.sin(a) * d * .6, 16 * u, S.tints[2]);
-        addHit(b.id, x, y, 22 * u);
-      } else if (b.kind === 'galaxy') {
-        drawGalaxy(x, y, r, sy * .0005 + tm * .03);
-        addHit(b.id, x, y, r * .55);
-      } else if (b.kind === 'eclipse') {
-        const beat = b.beat && tm ? Math.pow(Math.max(0, Math.sin(tm * 2.4)), 8) : 0;
-        drawEclipse(x, y, r * (1 + beat * .06), .75 + beat * .25);
-        addHit(b.id, x, y, r * 1.4);
-      } else if (b.kind === 'pulsar') {
-        drawPulsar(x, y, r, tm, u);
-        addHit(b.id, x, y, r * 3);
-      }
+      const off = sy - (z.top + b.f * z.h - H * .25);
+      groups.push({ sc: approach(off, 390 / b.k), x: W * b.x, y: H * (b.y != null ? b.y : (b.x < .5 ? .64 : .3)),
+        R: b.kind === 'bigmoon' ? Math.max(W * .5, 260) : b.kind === 'comet' ? 9999 : b.r * u * 3 + 40, draw: () => drawDeep(b, off, u, la, tm) });
     }
+
+    groups.sort((A, B) => A.sc - B.sc); // far before near
+    for (const g of groups) if (begin(g)) { g.draw(); end(); }
+    baseTransform();
 
     // a first tap on a two-tap body: a ring ripples out from it
     for (let i = pings.length - 1; i >= 0; i--) {
@@ -1706,15 +1762,15 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   }
 
   function draw(tm) {
-    if (!W || !layers.length) return;
-    const S = style, cx = W / 2, cy = H / 2, T = gen.S, half = T / 2;
+    if (!W || !stars.length) return;
+    const S = style;
     drawBack();
     ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
     ctx.clearRect(0, 0, W, H);
     ctx.setLineDash([]);
 
     if (S.polar) { // star-chart grid around a pole above the screen
-      const L = LAYERS[0], a = L.rot * sy + tm * L.drift;
+      const a = sy * .00005 + tm * .0007, R = Math.hypot(W, H) * 1.6;
       const px = W * .72, py = -Math.max(220, W * .24), ph = (sy * .05) % 170;
       ctx.strokeStyle = S.grid; ctx.lineWidth = 1;
       ctx.beginPath();
@@ -1724,51 +1780,45 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
       for (let k = 0; k < 36; k++) {
         const b = k * TAU / 36;
         ctx.moveTo(Math.cos(b) * 170, Math.sin(b) * 170);
-        ctx.lineTo(Math.cos(b) * T * 1.4, Math.sin(b) * T * 1.4);
+        ctx.lineTo(Math.cos(b) * R, Math.sin(b) * R);
       }
       ctx.stroke(); ctx.restore();
     }
 
-    for (let li = 0; li < 3; li++) {
-      const L = LAYERS[li], D = layers[li], list = D.list;
-      const ang = L.rot * sy + L.drift * tm, ca = Math.cos(ang), sa = Math.sin(ang);
-      const off = (sy * L.speed) % T;
-      let lastC = -1;
-      for (let i = 0; i < list.length; i++) {
-        const st = list[i];
-        let yy = st.y0 - off;
-        if (yy < 0) yy += T;
-        const lx = st.x0 - half, ly = yy - half;
-        const x = cx + lx * ca - ly * sa, y = cy + lx * sa + ly * ca;
-        if (li === 2) { D.xs[i] = x; D.ys[i] = y; }
-        if (x < -12 || x > W + 12 || y < -12 || y > H + 12) continue;
-        let a = st.a;
-        if (tm) a *= 1 - L.tw + L.tw * (.5 + .5 * Math.sin(tm * st.f + st.p));
-        ctx.globalAlpha = a;
-        if (li < 2) {
-          if (st.c !== lastC) { ctx.fillStyle = tintCss[st.c]; lastC = st.c; }
-          ctx.fillRect(x - st.s / 2, y - st.s / 2, st.s, st.s);
-        } else {
-          drawBright(x, y, st);
-        }
+    // fly forward: each star comes out of the distance towards the camera and slides past
+    const travel = sy * .9 + tm * 14, vel = sy - prevSy;
+    const streak = !reduce && Math.abs(vel) > 1.5 ? clamp(vel * 2.4, -260, 260) : 0;
+    const cx = W / 2, cy = H / 2;
+    let lastC = -1;
+    for (const st of stars) {
+      let z = (st.z - travel) % STAR_DEPTH;
+      if (z <= 1) z += STAR_DEPTH;
+      const k = FOCAL / z;
+      let x = VPX + st.x * k, y = VPY + st.y * k;
+      let a = st.a * clamp((STAR_DEPTH - z) / (STAR_DEPTH * .25), 0, 1);
+      if (tm) a *= .6 + .4 * (.5 + .5 * Math.sin(tm * st.f + st.p));
+      if (vortexE > 0) { // spiral into the black hole
+        const dx = x - cx, dy = y - cy, r = Math.hypot(dx, dy);
+        const ang = Math.atan2(dy, dx) + vortexE * (2.4 + 900 / (r + 120)), rr = r * (1 - vortexE);
+        x = cx + Math.cos(ang) * rr; y = cy + Math.sin(ang) * rr;
+        a *= 1 - vortexE * .7;
       }
+      if (x < -12 || x > W + 12 || y < -12 || y > H + 12 || a <= .01) continue;
+      const size = st.s * clamp(.35 + k * .55, .35, 3.4);
+      if (st.c !== lastC) { ctx.fillStyle = tintCss[st.c]; ctx.strokeStyle = tintCss[st.c]; lastC = st.c; }
+      if (streak && k > .5 && !vortexE) { // fast scrolling stretches near stars into light trails
+        const kp = FOCAL / (z + streak);
+        ctx.globalAlpha = a * .55; ctx.lineWidth = Math.max(.6, size * .6);
+        ctx.beginPath(); ctx.moveTo(VPX + st.x * kp, VPY + st.y * kp); ctx.lineTo(x, y); ctx.stroke();
+      }
+      ctx.globalAlpha = a;
+      if (size < 1.9) ctx.fillRect(x - size / 2, y - size / 2, size, size);
+      else { drawBright(x, y, st, size); lastC = -1; }
     }
     ctx.globalAlpha = 1;
+    prevSy = sy;
 
-    if (S.constellations) {
-      const xs = layers[2].xs, ys = layers[2].ys;
-      ctx.strokeStyle = S.constellations; ctx.lineWidth = .7;
-      ctx.beginPath();
-      for (let k = 0; k < segs.length; k += 2) {
-        const i = segs[k], j = segs[k + 1];
-        const x1 = xs[i], y1 = ys[i], x2 = xs[j], y2 = ys[j];
-        if (Math.abs(x1 - x2) + Math.abs(y1 - y2) > 300) continue; // pair split by the tile wrap
-        if ((x1 < -60 && x2 < -60) || (x1 > W + 60 && x2 > W + 60) || (y1 < -60 && y2 < -60) || (y1 > H + 60 && y2 > H + 60)) continue;
-        ctx.moveTo(x1, y1); ctx.lineTo(x2, y2);
-      }
-      ctx.stroke();
-    }
-
+    baseTransform();
     drawBodies(tm);
   }
 
@@ -1832,9 +1882,41 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     sealEl.style.visibility = sv > .04 ? 'visible' : 'hidden';
     sealEl.style.transform = reduce ? '' : `scale(${(.82 + .18 * si + .12 * so).toFixed(3)})`;
 
-    for (const el of nLines) el.style.opacity = clamp((H * .92 - (el._top - sy)) / (H * .3), 0, 1).toFixed(3);
+    // Das Nichts: the lines drift in from the sides out of the depth, stop to be read, then pass us
+    const nz = zones.nichts, nStart = nz.top + zones.nichtsPad, nEnd = nz.top + nz.h - H;
+    const nq = (sy - nStart) / Math.max(1, nEnd - nStart), n = nLines.length;
+    nLines.forEach((el, i) => {
+      const u = (nq - (i + .5) / n) * n, side = i % 2 ? 1 : -1;
+      if (u < -1.3 || u > 1.3) {
+        if (el._vis !== 0) { el.style.opacity = '0'; el.style.transform = ''; el._vis = 0; }
+        return;
+      }
+      el._vis = 1;
+      el.style.opacity = (smooth(clamp((u + 1.3) / .7, 0, 1)) * (1 - smooth(clamp((u - .25) / .45, 0, 1)))).toFixed(3);
+      if (reduce) { el.style.transform = ''; return; }
+      let x = 0, y = 0, z = 0, rot = 0;
+      if (u < -.1) { const k = (-.1 - u) / 1.2; z = -k * 2200; x = side * k * W * 1.1; y = -k * 30; rot = side * k * 32; }
+      else if (u <= .25) z = (u + .1) * 120;
+      else { const k = (u - .25) / 1.05; z = 42 + k * 800; x = -side * k * W * .4; rot = -side * k * 14; }
+      el.style.transform = `perspective(900px) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,${z.toFixed(1)}px) rotateY(${rot.toFixed(2)}deg)`;
+    });
 
-    const dStart = zones.void2.top + zones.void2.h * .5 - H, dMid = nLines[0]._top - H * .92, dEnd = zones.abyss - H * .6;
+    // the end: a white dot rises into the middle and grows until everything is light
+    const lz = zones.licht, lq = clamp((sy - lz.top) / Math.max(1, lz.h - H), 0, 1);
+    const grow = smooth(clamp(lq / .28, 0, 1)), cover = Math.hypot(W, H) / 2 * 1.05;
+    lCircle.style.opacity = smooth(clamp((sy - (lz.top - H * .6)) / (H * .5), 0, 1)).toFixed(3);
+    lCircle.style.setProperty('--r', (6 * Math.pow(cover / 6, grow)).toFixed(1) + 'px');
+    // on the white: "Alles." above, the sentence below; white; Fragerei and "Wir alle sind das Licht."; white; "Lass uns leuchten."
+    const a1 = seg(lq, .3, .355) * (1 - seg(lq, .44, .48)), a2 = seg(lq, .55, .61) * (1 - seg(lq, .72, .76)), a3 = seg(lq, .82, .88);
+    lEls.alles.style.opacity = lEls.dark.style.opacity = a1.toFixed(3);
+    lEls.brand.style.opacity = lEls.light.style.opacity = a2.toFixed(3);
+    lEls.end.style.opacity = a3.toFixed(3);
+    if (!reduce) {
+      lEls.brand.style.transform = `scale(${(.94 + .06 * seg(lq, .55, .61) + .03 * seg(lq, .72, .76)).toFixed(3)})`;
+      lEls.end.style.transform = `scale(${(.95 + .05 * a3).toFixed(3)})`;
+    }
+
+    const dStart = zones.void2.top + zones.void2.h * .5 - H, dMid = nStart - H * .3, dEnd = nEnd;
     let d;
     if (sy < dMid) { const t = clamp((sy - dStart) / Math.max(1, dMid - dStart), 0, 1); d = .85 * t * t; }
     else d = .85 + .15 * clamp((sy - dMid) / Math.max(1, dEnd - dMid), 0, 1);
@@ -1847,14 +1929,23 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     if (reduce) sy = target;
     else { sy += (target - sy) * .12; if (Math.abs(target - sy) < .1) sy = target; }
     const tm = reduce ? 0 : (now - t0) / 1000;
+    vortexE = vortexAmount(now);
     if (!inHole) {
       draw(tm);
       updateOrbs();
       updateDeep();
+      updateQtop();
     }
     if (!reduce) raf = requestAnimationFrame(tick);
   }
   function requestDraw() { if (!raf) raf = requestAnimationFrame(tick); }
+  function vortexAmount(now) {
+    if (!vortex) return 0;
+    const t = clamp((now - vortex.t0) / vortex.dur, 0, 1);
+    if (vortex.dir > 0) return Math.pow(t, 1.7); // pulled in, faster and faster
+    if (t >= 1) { vortex = null; return 0; }
+    return Math.pow(1 - t, 2.2); // spat back out, settling
+  }
 
   window.addEventListener('scroll', () => { if (reduce) requestDraw(); }, { passive: true });
   window.addEventListener('resize', resize);
@@ -1964,6 +2055,28 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   });
   if (reduce && logoEl.querySelector('svg').pauseAnimations) logoEl.querySelector('svg').pauseAnimations();
 
+  /* ---------- the question of the week, typed into a quiet line at the top ---------- */
+  const qtop = document.getElementById('qtop'), qtopText = document.getElementById('qtopText');
+  const heroBubble = document.querySelector('.hero .bubble');
+  let qtopTyped = false;
+  function typeQuestion() {
+    qtopTyped = true;
+    const text = document.getElementById('question').textContent;
+    if (reduce) { qtopText.textContent = text; qtop.classList.add('done'); return; }
+    let i = 0;
+    const step = () => {
+      qtopText.textContent = text.slice(0, ++i);
+      if (i < text.length) setTimeout(step, 40 + Math.random() * 55);
+      else qtop.classList.add('done');
+    };
+    setTimeout(step, 350);
+  }
+  function updateQtop() {
+    const show = heroBubble.getBoundingClientRect().bottom < 0 && parseFloat(fadeEl.style.opacity || 0) < .85;
+    if (show !== qtop.classList.contains('show')) qtop.classList.toggle('show', show);
+    if (show && !qtopTyped) typeQuestion();
+  }
+
   /* ---------- KOH & CHI: aliens or astronauts ---------- */
   const stage = document.getElementById('kcStage');
   const crewBtns = Array.from(document.querySelectorAll('.kc-toggle button'));
@@ -1984,31 +2097,37 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     if (holeBusy || inHole) return;
     holeBusy = true;
     closeQNow();
-    const D = reduce ? 350 : 1700;
-    const fade = [{ opacity: 1 }, { opacity: 0 }];
-    const skyAnims = [cv, bgc].map(el => el.animate(reduce ? fade
-      : [{ transform: 'none', filter: 'none' }, { transform: 'scale(.03) rotate(320deg)', filter: 'blur(3px)' }],
-      { duration: D, easing: SUCK, fill: 'forwards' }));
-    const stageAnim = stage.animate(reduce ? fade
-      : [{ transform: 'none', opacity: 1 }, { transform: 'scale(0) rotate(600deg)', opacity: 0 }],
-      { duration: D * .85, easing: SUCK, fill: 'forwards' });
+    const D = reduce ? 350 : 1900;
+    if (!reduce) vortex = { t0: performance.now(), dur: D, dir: 1 };
+    const nebAnim = bgc.animate([{ opacity: 1 }, { opacity: 0 }], { duration: D, easing: 'ease-in', fill: 'forwards' });
+    const stageAnim = stage.animate(reduce ? [{ opacity: 1 }, { opacity: 0 }]
+      : [{ transform: 'none', opacity: 1 }, { transform: 'scale(0) rotate(540deg)', opacity: 0 }],
+      { duration: D * .9, easing: 'cubic-bezier(.55,0,.8,.4)', fill: 'forwards' });
     const cover = Math.hypot(W, H) / 2 / 57 * 1.15; // 57px = radius of the black core
     bhEl.classList.remove('white');
     bhEl.style.opacity = '1';
     const bhAnim = bhEl.animate(reduce
       ? [{ transform: 'scale(1)', opacity: 0 }, { transform: `scale(${cover})`, opacity: 1 }]
-      : [{ transform: 'scale(0)' }, { transform: 'scale(1)', offset: .45 }, { transform: 'scale(1.2)', offset: .72 }, { transform: `scale(${cover})` }],
-      { duration: D + 500, easing: 'ease-in', fill: 'forwards' });
+      : [
+        { transform: 'scale(0)', opacity: 0, offset: 0, easing: 'cubic-bezier(.3,0,.3,1)' },
+        { transform: 'scale(.9)', opacity: 1, offset: .32, easing: 'ease-in-out' },
+        { transform: 'scale(1.15)', opacity: 1, offset: .66, easing: 'cubic-bezier(.7,0,.9,.5)' },
+        { transform: `scale(${cover})`, opacity: 1, offset: 1 },
+      ],
+      { duration: D + 600, fill: 'forwards' });
     bhAnim.finished.then(() => {
       inHole = true;
+      vortex = null; vortexE = 0;
       root.classList.add('in-hole');
       root.classList.remove('planet-hover');
       hoverId = null;
       hole.hidden = false;
       hole.scrollTop = 0;
       holeDot.style.setProperty('--s', '.4');
-      hole.animate([{ opacity: 0 }, { opacity: 1 }], { duration: reduce ? 200 : 700, easing: 'ease-out' });
-      skyAnims.forEach(a => a.cancel());
+      hole.animate(reduce ? [{ opacity: 0 }, { opacity: 1 }]
+        : [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }],
+        { duration: reduce ? 200 : 900, easing: 'cubic-bezier(.2,.7,.3,1)' });
+      nebAnim.cancel();
       stageAnim.cancel();
       bhAnim.cancel();
       bhEl.style.opacity = '0';
@@ -2020,9 +2139,10 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   function exitHole() {
     if (holeBusy || !inHole) return;
     holeBusy = true;
+    // the page closes like an iris into the centre, then the universe is spat back out
     const out = hole.animate(reduce ? [{ opacity: 1 }, { opacity: 0 }]
-      : [{ opacity: 1, transform: 'none', filter: 'none' }, { opacity: 0, transform: 'scale(.15) rotate(-120deg)', filter: 'blur(6px)' }],
-      { duration: reduce ? 200 : 850, easing: SUCK, fill: 'forwards' });
+      : [{ clipPath: 'circle(75% at 50% 50%)', filter: 'blur(0px)' }, { clipPath: 'circle(0% at 50% 50%)', filter: 'blur(4px)' }],
+      { duration: reduce ? 200 : 900, easing: SUCK, fill: 'forwards' });
     out.finished.then(() => {
       hole.hidden = true;
       out.cancel();
@@ -2031,15 +2151,16 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
       // land back where KOH & CHI float
       const z = zones.kohchi, target = z.top + (z.h - H) * .16;
       window.scrollTo(0, target);
-      sy = target;
+      sy = target; prevSy = target;
       backKey = '';
       if (!reduce) {
+        vortex = { t0: performance.now(), dur: 1700, dir: -1 };
         bhEl.classList.add('white');
         bhEl.style.opacity = '1';
-        bhEl.animate([{ transform: 'scale(2.6)', opacity: 1 }, { transform: 'scale(0)', opacity: 0 }], { duration: 750, easing: 'ease-out' })
+        bhEl.animate([{ transform: 'scale(2.6)', opacity: 1 }, { transform: 'scale(0)', opacity: 0 }], { duration: 800, easing: 'cubic-bezier(.2,.7,.3,1)' })
           .finished.then(() => { bhEl.style.opacity = '0'; bhEl.classList.remove('white'); });
-        [cv, bgc].forEach(el => el.animate([{ transform: 'scale(.03) rotate(-320deg)', filter: 'blur(3px)' }, { transform: 'none', filter: 'none' }], { duration: 1500, easing: SPIT }));
-        stage.animate([{ transform: 'scale(0) rotate(-600deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 1350, easing: SPIT });
+        bgc.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 1400, easing: 'ease-out' });
+        stage.animate([{ transform: 'scale(0) rotate(-540deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 1500, easing: SPIT });
       }
       requestDraw();
       holeBusy = false;
