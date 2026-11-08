@@ -338,10 +338,10 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .kc-toggle button{appearance:none;border:0;background:transparent;color:var(--chrome-dim);font:600 .64rem/1 var(--f-ui);letter-spacing:.12em;text-transform:uppercase;padding:8px 13px;border-radius:999px;cursor:pointer}
 .kc-toggle button[aria-pressed="true"]{background:rgba(255,255,255,.14);color:var(--chrome-ink)}
 
-.nichts{position:relative;z-index:1;padding-top:140vh;height:630vh}
+.nichts{position:relative;z-index:1;padding-top:140vh;height:900vh}
 .n-stage{position:sticky;top:0;height:100vh;height:100svh;display:grid;place-items:center;overflow:hidden;pointer-events:none}
-.n-line{grid-area:1/1;max-width:min(34rem,calc(100vw - 32px));margin:0;color:var(--void-ink);font-family:var(--f-body);font-size:clamp(1.15rem,1rem + .8vw,1.5rem);line-height:1.45;text-wrap:balance;text-align:center;opacity:0;will-change:transform,opacity}
-.n-title{font-family:var(--f-disp);font-size:clamp(1.6rem,1.2rem + 2vw,2.4rem);font-style:var(--h-style);font-weight:var(--h-wt);font-variation-settings:var(--h-var);text-transform:var(--h-tt)}
+.n-line{grid-area:1/1;max-width:min(34rem,calc(100vw - 32px));margin:0;color:#040407;font-weight:600;text-shadow:0 1px 2px rgba(255,255,255,.42),0 2px 12px rgba(255,255,255,.26);font-family:var(--f-body);font-size:clamp(1.15rem,1rem + .8vw,1.5rem);line-height:1.45;text-wrap:balance;text-align:center;opacity:0;will-change:transform,opacity}
+.n-title{max-width:calc(100vw - 32px);line-height:1.05;text-shadow:0 2px 4px rgba(255,255,255,.14),0 8px 26px rgba(255,255,255,.16);font-family:var(--f-disp);font-size:clamp(2.4rem,1.6rem + 5vw,5.5rem);font-style:var(--h-style);font-weight:var(--h-wt);font-variation-settings:var(--h-var);text-transform:var(--h-tt)}
 .abyss{height:90vh}
 
 /* the end: a small white circle grows until everything is light */
@@ -354,6 +354,8 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .l-top,.l-bottom{position:absolute;left:16px;right:16px;margin:0 auto;text-align:center;opacity:0}
 .l-top{top:calc(7vh + env(safe-area-inset-top,0px))}
 .l-bottom{bottom:calc(8vh + env(safe-area-inset-bottom,0px))}
+.l-amp{grid-area:1/1;opacity:0}
+.l-nichts .l-sub{margin:.7rem auto 0}
 :root:not(.live) .l-bottom{bottom:calc(8vh + 84px + env(safe-area-inset-bottom,0px))}
 .l-brand{grid-area:1/1;margin:0;font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:min(12rem,22vw);letter-spacing:-.02em;line-height:1;color:#fff;text-shadow:0 3px 6px rgba(50,50,75,.12),0 14px 40px rgba(50,50,75,.16);opacity:0}
 .l-end{grid-area:1/1;padding-inline:16px;text-align:center;text-wrap:balance;font-size:clamp(2.4rem,1.6rem + 5vw,5.5rem);opacity:0}
@@ -387,13 +389,10 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .hole-seal{display:block;width:92px;height:92px;overflow:visible}
 .hole-title{margin:0 0 6px;outline:none;font-family:var(--f-disp);font-size:clamp(2.4rem,1.6rem + 4vw,4rem);font-weight:var(--h-wt);font-style:var(--h-style);text-transform:var(--h-tt);font-variation-settings:var(--h-var);letter-spacing:var(--h-track);line-height:1;color:var(--ink)}
 :root[data-v="2c"] .hole-title{font-stretch:125%}
-.about{margin:0 -16px;padding:14px 16px;border-radius:12px;outline:none;font-size:1.12rem;line-height:1.65;color:var(--ink);transition:background-color .2s,box-shadow .2s}
-.about:hover{background:rgba(255,255,255,.03)}
-.about:focus{background:rgba(255,255,255,.05);box-shadow:inset 0 0 0 1px var(--line)}
+.about{margin:0;font-size:1.12rem;line-height:1.65;color:var(--ink)}
 .about p{margin:0 0 1em;white-space:pre-line}
 .about p:last-child{margin-bottom:0}
-.about mark{background:none;color:var(--accent);border-bottom:1px dashed var(--accent)}
-.about-note{margin:0;display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;color:var(--ink-3);font-size:.85rem}
+.about .about-sign{margin-top:1.6em;font-style:italic;color:var(--ink-2)}
 .hole-exit{position:relative;height:130vh}
 .hole-exit-pin{position:sticky;top:0;height:100vh;display:grid;place-content:center;justify-items:center;gap:22px;text-align:center;color:var(--ink-3);font-family:var(--f-lbl);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase}
 .hole-exit-pin p{margin:0}
@@ -833,9 +832,13 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   <div class="l-stage">
     <div class="l-circle" id="lCircle" aria-hidden="true"></div>
     <p class="l-title l-top" id="lAlles">Alles.</p>
-    <p class="l-sub l-bottom" id="lDark">Dunkelheit ist die Abwesenheit vom Licht.</p>
+    <p class="l-title l-amp" id="lAmp">&amp;</p>
+    <div class="l-bottom l-nichts" id="lNichts">
+      <p class="l-title">Nichts.</p>
+      <p class="l-sub">Dunkelheit ist die Abwesenheit vom Licht.</p>
+    </div>
     <p class="l-brand" id="lBrand">Fragerei</p>
-    <p class="l-sub l-bottom" id="lLight">Wir alle sind das Licht.</p>
+    <p class="l-sub l-bottom" id="lLight">Das Licht ist in uns allen.</p>
     <p class="l-title l-end" id="lEnd">Lass uns leuchten.</p>
   </div>
 </section>
@@ -853,14 +856,13 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     </svg>
     <p class="eyebrow">Im Schwarzen Loch</p>
     <h2 class="hole-title" id="holeTitle" tabindex="-1">Los Questioneros</h2>
-    <div class="about" id="aboutText" contenteditable="true" spellcheck="true" role="textbox" aria-multiline="true" aria-label="Text über Los Questioneros, direkt bearbeitbar">
-      <p>Wir sind KOH • CHI, ein Kollektiv aus <mark>[wer ihr seid: Namen, Ort, wie viele]</mark>.</p>
-      <p>Mit der Fragerei legen wir jede Woche eine Frage hin. Für das Tram, den Znachttisch und alles dazwischen. Weil eine ehrliche Frage mehr Türen öffnet als jeder Small Talk.</p>
-      <p>Angefangen hat alles, als <mark>[eure Geschichte: wann, wo, warum]</mark>.</p>
-      <p><mark>[Was euch antreibt, in einem Satz.]</mark></p>
-      <p>Fröged enand. Und schreibt uns: <mark>[Kontakt]</mark></p>
+    <div class="about" id="aboutText">
+      <p>Wir sind KOH • CHI, ein Kollektiv aus Freundschaft, geteilter Freude, geballter Kreativität, Lust an Spielerei, freiem Denken, diagonalen Ideen, spezifischer Wortwahl, herzlichem Interesse und echtem Ausdruck.</p>
+      <p>Die Fragerei ist unsere Antwort auf das Thema Einsamkeit.</p>
+      <p>Mach mit, verändere die Interaktionen, Frage Fremde, Frage Vertraute, Frage nach, Frage tief, Frage frei, höre zu, sei da, sei du, sei onara – wie du willst.</p>
+      <p class="about-sign">Liebevoll,
+Koh &amp; Chi</p>
     </div>
-    <p class="about-note"><span>Tipp in den Text, um ihn direkt hier zu schreiben. Er wird nur in diesem Browser gespeichert.</span><button class="link-btn" id="aboutReset" type="button">Text zurücksetzen</button></p>
   </div>
   <div class="hole-exit" id="holeExit">
     <div class="hole-exit-pin">
@@ -1117,7 +1119,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   let backKey = '';
   const zones = { contentEnd: 1, abyss: 1, nichtsPad: 0, void1: { top: 0, h: 1 }, kohchi: { top: 0, h: 1 }, void2: { top: 0, h: 1 }, nichts: { top: 0, h: 1 }, licht: { top: 0, h: 1 } };
   const lCircle = document.getElementById('lCircle');
-  const lEls = { alles: document.getElementById('lAlles'), dark: document.getElementById('lDark'), brand: document.getElementById('lBrand'), light: document.getElementById('lLight'), end: document.getElementById('lEnd') };
+  const lEls = { alles: document.getElementById('lAlles'), amp: document.getElementById('lAmp'), nichts: document.getElementById('lNichts'), brand: document.getElementById('lBrand'), light: document.getElementById('lLight'), end: document.getElementById('lEnd') };
   const hits = [];
   const pings = []; // first taps on two-tap bodies
   let mx = -1, my = -1, overUI = false, hoverId = null;
@@ -1887,28 +1889,30 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     const nq = (sy - nStart) / Math.max(1, nEnd - nStart), n = nLines.length;
     nLines.forEach((el, i) => {
       const u = (nq - (i + .5) / n) * n, side = i % 2 ? 1 : -1;
-      if (u < -1.3 || u > 1.3) {
+      if (u < -.55 || u > .55) {
         if (el._vis !== 0) { el.style.opacity = '0'; el.style.transform = ''; el._vis = 0; }
         return;
       }
       el._vis = 1;
-      el.style.opacity = (smooth(clamp((u + 1.3) / .7, 0, 1)) * (1 - smooth(clamp((u - .25) / .45, 0, 1)))).toFixed(3);
+      el.style.opacity = (smooth(clamp((u + .5) / .25, 0, 1)) * (1 - smooth(clamp((u - .25) / .2, 0, 1)))).toFixed(3);
       if (reduce) { el.style.transform = ''; return; }
       let x = 0, y = 0, z = 0, rot = 0;
-      if (u < -.1) { const k = (-.1 - u) / 1.2; z = -k * 2200; x = side * k * W * 1.1; y = -k * 30; rot = side * k * 32; }
-      else if (u <= .25) z = (u + .1) * 120;
-      else { const k = (u - .25) / 1.05; z = 42 + k * 800; x = -side * k * W * .4; rot = -side * k * 14; }
+      if (u < -.15) { const k = (-.15 - u) / .35; z = -k * 2200; x = side * k * W * 1.1; y = -k * 30; rot = side * k * 32; }
+      else if (u <= .25) z = (u + .15) * 100;
+      else { const k = (u - .25) / .25; z = 40 + k * 700; x = -side * k * W * .35; rot = -side * k * 12; }
       el.style.transform = `perspective(900px) translate3d(${x.toFixed(1)}px,${y.toFixed(1)}px,${z.toFixed(1)}px) rotateY(${rot.toFixed(2)}deg)`;
     });
 
     // the end: a white dot rises into the middle and grows until everything is light
     const lz = zones.licht, lq = clamp((sy - lz.top) / Math.max(1, lz.h - H), 0, 1);
     const grow = smooth(clamp(lq / .28, 0, 1)), cover = Math.hypot(W, H) / 2 * 1.05;
-    lCircle.style.opacity = smooth(clamp((sy - (lz.top - H * .6)) / (H * .5), 0, 1)).toFixed(3);
+    lCircle.style.opacity = smooth(clamp((sy - lz.top) / (H * .3), 0, 1)).toFixed(3);
     lCircle.style.setProperty('--r', (6 * Math.pow(cover / 6, grow)).toFixed(1) + 'px');
     // on the white: "Alles." above, the sentence below; white; Fragerei and "Wir alle sind das Licht."; white; "Lass uns leuchten."
-    const a1 = seg(lq, .3, .355) * (1 - seg(lq, .44, .48)), a2 = seg(lq, .55, .61) * (1 - seg(lq, .72, .76)), a3 = seg(lq, .82, .88);
-    lEls.alles.style.opacity = lEls.dark.style.opacity = a1.toFixed(3);
+    const out1 = 1 - seg(lq, .45, .49), a2 = seg(lq, .55, .61) * (1 - seg(lq, .72, .76)), a3 = seg(lq, .82, .88);
+    lEls.alles.style.opacity = (seg(lq, .29, .33) * out1).toFixed(3);
+    lEls.amp.style.opacity = (seg(lq, .32, .36) * out1).toFixed(3);
+    lEls.nichts.style.opacity = (seg(lq, .35, .39) * out1).toFixed(3);
     lEls.brand.style.opacity = lEls.light.style.opacity = a2.toFixed(3);
     lEls.end.style.opacity = a3.toFixed(3);
     if (!reduce) {
@@ -2175,33 +2179,8 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
     if (z > .985) exitHole();
   }, { passive: true });
 
-  // the "Über uns" text is editable in place; kept as plain text in this browser only
-  const about = document.getElementById('aboutText');
-  const aboutDefault = about.innerHTML;
-  function setAboutText(text) {
-    about.textContent = '';
-    for (const part of text.split(/\n{2,}/)) {
-      const p = document.createElement('p');
-      p.textContent = part.trim();
-      if (p.textContent) about.appendChild(p);
-    }
-  }
-  try { const saved = localStorage.getItem('fragerei-about'); if (saved) setAboutText(saved); } catch (e) {}
-  let aboutT = 0;
-  about.addEventListener('input', () => {
-    clearTimeout(aboutT);
-    aboutT = setTimeout(() => { try { localStorage.setItem('fragerei-about', about.innerText); } catch (e) {} }, 400);
-  });
-  about.addEventListener('paste', e => {
-    const text = e.clipboardData && e.clipboardData.getData('text/plain');
-    if (text == null) return;
-    e.preventDefault();
-    document.execCommand('insertText', false, text);
-  });
-  document.getElementById('aboutReset').addEventListener('click', () => {
-    about.innerHTML = aboutDefault;
-    try { localStorage.removeItem('fragerei-about'); } catch (e) {}
-  });
+  // the text used to be editable in place; drop what an earlier visit may have stored
+  try { localStorage.removeItem('fragerei-about'); } catch (e) {}
 
   /* ---------- shooting-star wish: nothing is stored or sent ---------- */
   const wishForm = document.getElementById('wishForm');
