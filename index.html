@@ -397,7 +397,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .hole-exit-pin p{margin:0}
 .hole-exit-dot{width:140px;height:140px;margin:-63px 0;border-radius:50%;background:#fff;box-shadow:0 0 60px 16px rgba(255,255,255,.35);transform:scale(var(--s,.1))}
 .hole-exit-pin p{opacity:var(--t,1)}
-.exit-light{position:fixed;inset:0;z-index:12;pointer-events:none;--r:0px;--cx:50%;--cy:50%;background:radial-gradient(circle at var(--cx) var(--cy),#fff 0,#fff var(--r),rgba(255,255,255,.45) calc(var(--r) + 2px),rgba(255,255,255,0) calc(var(--r) * 1.25 + 40px))}
+.exit-light{position:fixed;inset:0;z-index:12;pointer-events:none;--r:0px;--cx:50%;--cy:50%;background:radial-gradient(circle at var(--cx) var(--cy),#fff 0,#fff var(--r),rgba(255,255,255,.24) calc(var(--r) + 1px),rgba(255,255,255,.12) calc(var(--r) + 16px),rgba(255,255,255,.04) calc(var(--r) + 36px),rgba(255,255,255,0) calc(var(--r) + 60px))}
 .exit-light.opening{--h:-140px;background:#fff;-webkit-mask:radial-gradient(circle at 50% 50%,transparent var(--h),#000 calc(var(--h) + 140px));mask:radial-gradient(circle at 50% 50%,transparent var(--h),#000 calc(var(--h) + 140px))}
 
 /* hidden question card */
@@ -2133,7 +2133,9 @@ Koh &amp; Chi</p>
       hole.hidden = false;
       hole.scrollTop = 0;
       holeDot.style.setProperty('--s', '.1');
+      holeDot.style.visibility = '';
       holeExit.style.setProperty('--t', '1');
+      hole.style.overflow = '';
       hole.animate(reduce ? [{ opacity: 0 }, { opacity: 1 }]
         : [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }],
         { duration: reduce ? 200 : 900, easing: 'cubic-bezier(.2,.7,.3,1)' });
@@ -2173,6 +2175,10 @@ Koh &amp; Chi</p>
     exitLight.style.setProperty('--cy', cy.toFixed(1) + 'px');
     exitLight.style.setProperty('--r', r0.toFixed(1) + 'px');
     exitLight.hidden = false;
+    // only one circle: the light takes the dot's place, and the hole stops scrolling so nothing drifts beneath it
+    holeDot.style.visibility = 'hidden';
+    holeExit.style.setProperty('--t', '0');
+    hole.style.overflow = 'hidden';
     const D = reduce ? 250 : 1300;
     hole.style.transformOrigin = `${cx.toFixed(1)}px ${cy.toFixed(1)}px`;
     const out = hole.animate(reduce ? [{ opacity: 1 }, { opacity: 1 }]
@@ -2180,6 +2186,8 @@ Koh &amp; Chi</p>
       { duration: D, easing: SUCK, fill: 'forwards' });
     tweenVar(exitLight, '--r', r0, R, D, easeIn).then(() => {
       hole.hidden = true;
+      hole.style.overflow = '';
+      holeDot.style.visibility = '';
       out.cancel();
       hole.style.transformOrigin = '';
       inHole = false;
