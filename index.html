@@ -354,8 +354,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .l-top,.l-bottom{position:absolute;left:16px;right:16px;margin:0 auto;text-align:center;opacity:0}
 .l-top{top:calc(7vh + env(safe-area-inset-top,0px))}
 .l-bottom{bottom:calc(8vh + env(safe-area-inset-bottom,0px))}
-.l-amp{grid-area:1/1;opacity:0}
-.l-nichts .l-sub{margin:.7rem auto 0}
+.l-amp{grid-area:1/1;margin:0;font-family:var(--f-body);font-weight:400;font-size:clamp(1.8rem,1.5rem + 1.2vw,2.6rem);line-height:1;color:#fff;text-shadow:0 1px 3px rgba(40,40,65,.3),0 4px 14px rgba(40,40,65,.2);opacity:0}
 :root:not(.live) .l-bottom{bottom:calc(8vh + 84px + env(safe-area-inset-bottom,0px))}
 .l-brand{grid-area:1/1;margin:0;font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:min(12rem,22vw);letter-spacing:-.02em;line-height:1;color:#fff;text-shadow:0 3px 6px rgba(50,50,75,.12),0 14px 40px rgba(50,50,75,.16);opacity:0}
 .l-end{grid-area:1/1;padding-inline:16px;text-align:center;text-wrap:balance;font-size:clamp(2.4rem,1.6rem + 5vw,5.5rem);opacity:0}
@@ -396,7 +395,10 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .hole-exit{position:relative;height:130vh}
 .hole-exit-pin{position:sticky;top:0;height:100vh;display:grid;place-content:center;justify-items:center;gap:22px;text-align:center;color:var(--ink-3);font-family:var(--f-lbl);font-size:.7rem;letter-spacing:.18em;text-transform:uppercase}
 .hole-exit-pin p{margin:0}
-.hole-exit-dot{width:14px;height:14px;border-radius:50%;background:#fff;box-shadow:0 0 30px 8px rgba(255,255,255,.35);transform:scale(var(--s,.4))}
+.hole-exit-dot{width:140px;height:140px;margin:-63px 0;border-radius:50%;background:#fff;box-shadow:0 0 60px 16px rgba(255,255,255,.35);transform:scale(var(--s,.1))}
+.hole-exit-pin p{opacity:var(--t,1)}
+.exit-light{position:fixed;inset:0;z-index:12;pointer-events:none;--r:0px;--cx:50%;--cy:50%;background:radial-gradient(circle at var(--cx) var(--cy),#fff 0,#fff var(--r),rgba(255,255,255,.45) calc(var(--r) + 2px),rgba(255,255,255,0) calc(var(--r) * 1.25 + 40px))}
+.exit-light.opening{--h:-140px;background:#fff;-webkit-mask:radial-gradient(circle at 50% 50%,transparent var(--h),#000 calc(var(--h) + 140px));mask:radial-gradient(circle at 50% 50%,transparent var(--h),#000 calc(var(--h) + 140px))}
 
 /* hidden question card */
 .qcard{position:fixed;z-index:12;left:50%;top:50%;width:min(31rem,calc(100% - 32px));box-sizing:border-box;transform:translate(-50%,-50%);display:flex;flex-direction:column;gap:16px;padding:20px 20px 18px;border-radius:22px;background:var(--chrome-bg);border:1px solid var(--chrome-line);-webkit-backdrop-filter:blur(18px);backdrop-filter:blur(18px);box-shadow:0 30px 80px -20px rgba(0,0,0,.8);color:var(--chrome-ink);outline:none}
@@ -832,10 +834,9 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   <div class="l-stage">
     <div class="l-circle" id="lCircle" aria-hidden="true"></div>
     <p class="l-title l-top" id="lAlles">Alles.</p>
-    <p class="l-title l-amp" id="lAmp">&amp;</p>
+    <p class="l-amp" id="lAmp">&amp;</p>
     <div class="l-bottom l-nichts" id="lNichts">
       <p class="l-title">Nichts.</p>
-      <p class="l-sub">Dunkelheit ist die Abwesenheit vom Licht.</p>
     </div>
     <p class="l-brand" id="lBrand">Fragerei</p>
     <p class="l-sub l-bottom" id="lLight">Das Licht ist in uns allen.</p>
@@ -871,6 +872,8 @@ Koh &amp; Chi</p>
     </div>
   </div>
 </section>
+
+<div class="exit-light" id="exitLight" aria-hidden="true" hidden></div>
 
 <div class="qcard" id="qcard" role="dialog" aria-labelledby="qcardQ" tabindex="-1" hidden>
   <div class="qcard-head"><b id="qcardLabel">Versteckte Frage</b><span id="qcardCount">1 von 13 gefunden</span></div>
@@ -1832,19 +1835,20 @@ Koh &amp; Chi</p>
       return;
     }
     orbsCleared = false;
-    const Rx = Math.min(W * .42, 560), Ry = clamp(H * .12, 60, 120);
     for (const el of orbEls) {
-      const p = clamp((H * .96 - (el._top - sy)) / (H * .5), 0, 1);
+      const p = clamp((H * .98 - (el._top - sy)) / (H * .4), 0, 1);
       if (p >= 1) {
         if (el._state !== 1) { el.style.transform = 'none'; el.style.opacity = '1'; el._state = 1; }
         continue;
       }
       el._state = 0;
-      const e = 1 - Math.pow(1 - p, 3), th = (1 - e) * 1.75, s = el._side;
-      const dx = s * Rx * Math.sin(th), dy = -Ry * (1 - Math.cos(th));
-      const sc = .62 + .38 * (1 + Math.cos(th)) / 2;
-      el.style.transform = `perspective(1100px) translate3d(${dx.toFixed(1)}px,${dy.toFixed(1)}px,0) rotateY(${(s * th * .38).toFixed(3)}rad) scale(${sc.toFixed(3)})`;
-      el.style.opacity = clamp(e * 1.7, 0, 1).toFixed(3);
+      // like the questions in Das Nichts: out of the depth from the side (alternating right and left),
+      // over a short stretch of scrolling, so it slides in sideways rather than rising from below
+      const e = 1 - Math.pow(1 - p, 3), k = 1 - e, s = el._side;
+      const lift = -(1 - p) * H * .4 * .3;
+      const x = s * k * W * 1.1, z = -k * 1800, rot = s * k * 30;
+      el.style.transform = `translateY(${lift.toFixed(1)}px) perspective(1000px) translate3d(${x.toFixed(1)}px,0,${z.toFixed(1)}px) rotateY(${rot.toFixed(2)}deg)`;
+      el.style.opacity = smooth(clamp(p / .55, 0, 1)).toFixed(3);
     }
   }
 
@@ -2094,6 +2098,7 @@ Koh &amp; Chi</p>
   const hole = document.getElementById('hole');
   const holeExit = document.getElementById('holeExit');
   const holeDot = document.getElementById('holeDot');
+  const exitLight = document.getElementById('exitLight');
   const holeTitle = document.getElementById('holeTitle');
   const SUCK = 'cubic-bezier(.6,0,.9,.4)', SPIT = 'cubic-bezier(.15,.6,.3,1)';
 
@@ -2127,7 +2132,8 @@ Koh &amp; Chi</p>
       hoverId = null;
       hole.hidden = false;
       hole.scrollTop = 0;
-      holeDot.style.setProperty('--s', '.4');
+      holeDot.style.setProperty('--s', '.1');
+      holeExit.style.setProperty('--t', '1');
       hole.animate(reduce ? [{ opacity: 0 }, { opacity: 1 }]
         : [{ clipPath: 'circle(0% at 50% 50%)' }, { clipPath: 'circle(75% at 50% 50%)' }],
         { duration: reduce ? 200 : 900, easing: 'cubic-bezier(.2,.7,.3,1)' });
@@ -2140,16 +2146,42 @@ Koh &amp; Chi</p>
     });
   }
 
+  // drives a CSS length variable on the light overlay frame by frame
+  function tweenVar(el, name, from, to, dur, ease) {
+    return new Promise(done => {
+      const t0 = performance.now();
+      (function step(now) {
+        const t = clamp((now - t0) / dur, 0, 1);
+        el.style.setProperty(name, (from + (to - from) * ease(t)).toFixed(1) + 'px');
+        if (t < 1) requestAnimationFrame(step); else done();
+      })(t0);
+    });
+  }
+  const easeIn = t => t * t * t, easeOut = t => 1 - Math.pow(1 - t, 3);
+
   function exitHole() {
     if (holeBusy || !inHole) return;
     holeBusy = true;
-    // the page closes like an iris into the centre, then the universe is spat back out
-    const out = hole.animate(reduce ? [{ opacity: 1 }, { opacity: 0 }]
-      : [{ clipPath: 'circle(75% at 50% 50%)', filter: 'blur(0px)' }, { clipPath: 'circle(0% at 50% 50%)', filter: 'blur(4px)' }],
-      { duration: reduce ? 200 : 900, easing: SUCK, fill: 'forwards' });
-    out.finished.then(() => {
+    // back through the white circle: it grows until everything is light, then space opens up behind it
+    const dr = holeDot.getBoundingClientRect();
+    const onDot = dr.width > 2 && dr.bottom > 0 && dr.top < H;
+    const cx = onDot ? dr.left + dr.width / 2 : W / 2, cy = onDot ? dr.top + dr.height / 2 : H / 2;
+    const r0 = onDot ? dr.width / 2 : 7;
+    const R = Math.hypot(Math.max(cx, W - cx), Math.max(cy, H - cy)) * 1.05;
+    exitLight.classList.remove('opening');
+    exitLight.style.setProperty('--cx', cx.toFixed(1) + 'px');
+    exitLight.style.setProperty('--cy', cy.toFixed(1) + 'px');
+    exitLight.style.setProperty('--r', r0.toFixed(1) + 'px');
+    exitLight.hidden = false;
+    const D = reduce ? 250 : 1300;
+    hole.style.transformOrigin = `${cx.toFixed(1)}px ${cy.toFixed(1)}px`;
+    const out = hole.animate(reduce ? [{ opacity: 1 }, { opacity: 1 }]
+      : [{ transform: 'none', filter: 'blur(0px)' }, { transform: 'scale(1.35)', filter: 'blur(3px)' }],
+      { duration: D, easing: SUCK, fill: 'forwards' });
+    tweenVar(exitLight, '--r', r0, R, D, easeIn).then(() => {
       hole.hidden = true;
       out.cancel();
+      hole.style.transformOrigin = '';
       inHole = false;
       root.classList.remove('in-hole');
       // land back where KOH & CHI float
@@ -2159,15 +2191,21 @@ Koh &amp; Chi</p>
       backKey = '';
       if (!reduce) {
         vortex = { t0: performance.now(), dur: 1700, dir: -1 };
-        bhEl.classList.add('white');
-        bhEl.style.opacity = '1';
-        bhEl.animate([{ transform: 'scale(2.6)', opacity: 1 }, { transform: 'scale(0)', opacity: 0 }], { duration: 800, easing: 'cubic-bezier(.2,.7,.3,1)' })
-          .finished.then(() => { bhEl.style.opacity = '0'; bhEl.classList.remove('white'); });
         bgc.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 1400, easing: 'ease-out' });
         stage.animate([{ transform: 'scale(0) rotate(-540deg)', opacity: 0 }, { transform: 'none', opacity: 1 }], { duration: 1500, easing: SPIT });
       }
       requestDraw();
-      holeBusy = false;
+      // the light opens from the middle and the universe comes back through it
+      exitLight.style.setProperty('--h', '-140px');
+      exitLight.classList.add('opening');
+      const RO = Math.hypot(W, H) / 2 + 160;
+      setTimeout(() => {
+        tweenVar(exitLight, '--h', -140, RO, reduce ? 250 : 1500, easeOut).then(() => {
+          exitLight.hidden = true;
+          exitLight.classList.remove('opening');
+          holeBusy = false;
+        });
+      }, reduce ? 0 : 160);
     });
   }
 
@@ -2175,7 +2213,8 @@ Koh &amp; Chi</p>
   document.getElementById('holeBack').addEventListener('click', exitHole);
   hole.addEventListener('scroll', () => {
     const z = clamp((hole.scrollTop + hole.clientHeight - holeExit.offsetTop) / holeExit.offsetHeight, 0, 1);
-    holeDot.style.setProperty('--s', (.4 + z * z * 7).toFixed(3));
+    holeDot.style.setProperty('--s', (.1 + z * z * .9).toFixed(3));
+    holeExit.style.setProperty('--t', clamp(1 - z * 1.6, 0, 1).toFixed(3));
     if (z > .985) exitHole();
   }, { passive: true });
 
