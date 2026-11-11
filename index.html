@@ -823,7 +823,7 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   <p class="n-line">Was geschieht, wenn du dich mit der Leere in dir befreundest?</p>
   <p class="n-line">Heisst du den Nebel in dir willkommen?</p>
   <p class="n-line">Was verändert sich, wenn Langeweile auftaucht und du in sie hineinspringst – in dir?</p>
-  <p class="n-line">Merkst du, was sich in dir verändert, wenn du Ja zum Ungewissen sagst?</p>
+  <p class="n-line">Wie fühlt es sich an, Ja zum Ungewissen zu sagen?</p>
   <p class="n-line">Wo spürst du dein Interesse, diesen ewigen Raum in dir zu erkunden – die Weite, die Leere, die Stille kennen zu lernen?</p>
   <p class="n-line">Was passiert, wenn du dich fallen lässt – in dich hinein, in deine innere Umarmung?</p>
   <p class="n-line n-title">Das Nichts. Im All.</p>
@@ -878,7 +878,7 @@ Koh &amp; Chi</p>
 <div class="qcard" id="qcard" role="dialog" aria-labelledby="qcardQ" tabindex="-1" hidden>
   <div class="qcard-head"><b id="qcardLabel">Versteckte Frage</b><span id="qcardCount">1 von 13 gefunden</span></div>
   <div class="bubble"><p class="question" id="qcardQ"></p></div>
-  <div class="qcard-foot"><span>Stell sie jemandem.</span><button class="btn btn-ghost" id="qcardClose" type="button">Schliessen</button></div>
+  <div class="qcard-foot"><span id="qcardFoot">Stell sie jemandem.</span><button class="btn btn-ghost" id="qcardClose" type="button">Schliessen</button></div>
 </div>
 
 <nav class="switcher" aria-label="Design-Version wählen">
@@ -1084,7 +1084,7 @@ Koh &amp; Chi</p>
   };
   // these show their question only on the second tap (until found once); the big moon alternates A, B
   const NEED2 = new Set(['sun', 'twin', 'comet', 'tief1']);
-  const TOTAL = Object.keys(QUESTIONS).length;
+  const TOTAL = Object.values(QUESTIONS).filter(q => q.trim()).length; // an emptied question leaves its body with a hint
 
   const cv = document.getElementById('stars');
   const ctx = cv.getContext('2d');
@@ -1748,7 +1748,11 @@ Koh &amp; Chi</p>
       if (age >= 1) { pings.splice(i, 1); continue; }
       const h = hits.find(o => o.id === pg.id);
       if (!h) continue;
-      ctx.save(); ctx.globalAlpha = 1 - age; ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.5;
+      ctx.save(); ctx.globalAlpha = 1 - age;
+      const glow = ctx.createRadialGradient(h.x, h.y, 0, h.x, h.y, h.r * 1.9);
+      glow.addColorStop(0, `rgba(255,255,255,${(.6 * (1 - age)).toFixed(3)})`); glow.addColorStop(1, 'rgba(255,255,255,0)');
+      ctx.fillStyle = glow; ctx.beginPath(); ctx.arc(h.x, h.y, h.r * 1.9, 0, TAU); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,.85)'; ctx.lineWidth = 1.5;
       ctx.beginPath(); ctx.arc(h.x, h.y, h.r * (.8 + age * 1.2), 0, TAU); ctx.stroke(); ctx.restore();
     }
 
@@ -1988,11 +1992,36 @@ Koh &amp; Chi</p>
     }
     return best;
   }
+  // each week a device may find 2 to 5 new questions (drawn once, never shown); found ones stay open anytime
+  const WAIT_TEXT = 'Diese Frage wartet auf dich bis nächste Woche.';
+  const WAIT_FOOT = 'Ab Montag warten neue Fragen auf dich.';
+  const EMPTY_TEXT = 'Hier ist nichts – such weiter.';
+  function weekFinds() {
+    const { week: w, year: y } = getISOWeek(), key = y + '-' + w;
+    let rec = null;
+    try { rec = JSON.parse(localStorage.getItem('fragerei-week-finds') || 'null'); } catch (e) {}
+    if (!rec || rec.week !== key || !Array.isArray(rec.ids)) rec = { week: key, ids: [] };
+    if (!(rec.max >= 2 && rec.max <= 5)) {
+      rec.max = 2 + Math.floor(Math.random() * 4);
+      try { localStorage.setItem('fragerei-week-finds', JSON.stringify(rec)); } catch (e) {}
+    }
+    return rec;
+  }
   function openQ(id) {
-    found.add(id);
-    try { localStorage.setItem('fragerei-found', JSON.stringify([...found])); } catch (e) {}
-    qText.textContent = QUESTIONS[id];
-    document.getElementById('qcardLabel').textContent = id.startsWith('tief') ? 'Tieffrage' : id.startsWith('mond') ? 'Frage vom Mond' : 'Versteckte Frage';
+    const q = (QUESTIONS[id] || '').trim();
+    const wk = weekFinds();
+    const isNew = q && !found.has(id), waits = isNew && wk.ids.length >= wk.max;
+    if (isNew && !waits) {
+      found.add(id);
+      wk.ids.push(id);
+      try {
+        localStorage.setItem('fragerei-found', JSON.stringify([...found]));
+        localStorage.setItem('fragerei-week-finds', JSON.stringify(wk));
+      } catch (e) {}
+    }
+    qText.textContent = !q ? EMPTY_TEXT : waits ? WAIT_TEXT : q;
+    document.getElementById('qcardLabel').textContent = !q ? 'Leer' : waits ? 'Noch verborgen' : id.startsWith('tief') ? 'Tieffrage' : id.startsWith('mond') ? 'Frage vom Mond' : 'Versteckte Frage';
+    document.getElementById('qcardFoot').textContent = !q ? '' : waits ? WAIT_FOOT : 'Stell sie jemandem.';
     qCount.textContent = `${found.size} von ${TOTAL} gefunden`;
     if (qcard.hidden) lastFocus = document.activeElement;
     qcard.hidden = false;
@@ -2302,19 +2331,59 @@ Koh &amp; Chi</p>
   });
 
   /* ---------- week number + countdown ---------- */
-  // same list, week count and per-device offset as the live site, so nobody's question changes
+  // the list from the doc "Fragerei – alle Fragen"; the first 11 are the live site's original ones
   const FRAGEN = [
-    'Wele Gedanke häsch du i dim Läbe am meiste dänkt?',
-    'Was sind dini Prioritäte im Läbe?',
-    'Wenn vergüssisch du Freudeträne?',
-    'I welne Moment fühlsch du dich schön?',
-    'Wänn bisch du sletschtmal so richtig stolz gsi uf dich?',
-    'Wie chönd jungi Mänsche ihrem Läbe en Sinn geh?',
-    'Wenn du es Tier chönntsch sii, weles wär das und wieso?',
-    'Wie überwindisch du din innere Schweinehund?',
-    'Was hät dich als letscht zum Schmunzle bracht?',
+    "Wele Gedanke häsch du i dim Läbe am meiste dänkt?",
+    "Was sind dini Prioritäte im Läbe?",
+    "Wenn vergüssisch du Freudeträne?",
+    "I welne Moment fühlsch du dich schön?",
+    "Wänn bisch du sletschtmal so richtig stolz gsi uf dich?",
+    "Wie Mänsche ihrem Läbe en Sinn geh?",
+    "Wenn du es Tier chönntsch sii, weles wär das und wieso?",
+    "Wie überwindisch du din innere Schweinehund?",
+    "Was hät dich als letscht zum Schmunzle bracht?",
     "Wenn häsch sletschtmal bewusst öppis gmacht zum sLäbe vonere andere Person z'verschönere?",
-    'Wenn fühlsch du dich i dim Element?',
+    "Wenn fühlsch du dich i dim Element?",
+    "Welche Frage würdest du gerne gestellt bekommen?",
+    "Welches Kompliment berührt dich am meisten?",
+    "Welches Kompliment bekommst du am meisten?",
+    "Wie zeigst du, dass du geküsst werden willst?",
+    "Wenn du dich für eine Sauce für den Rest deines Lebens entscheiden müsstest, welche wäre es?",
+    "Was ist dein Unter-der-Dusche-singen Lied?",
+    "Wo und wie fühlst du dich angekommen?",
+    "Weles Gfühl fühlsch am meiste?",
+    "Wie führst du dich selbst?",
+    "Was heisst für dich Loyalität?",
+    "Was ist die Quelle deiner Kreativität?",
+    "Was berührt dich a dir?",
+    "Was berührt dis Herz?",
+    "Morgen kommt der wöchentliche Newsletter über dich raus, was wird drin stehen?",
+    "Was frögsch du dich am meiste?",
+    "Was isch i dir dominant?",
+    "Wie klingts i dir? (Töne willkommen)",
+    "Wie machsch du Schluss?",
+    "Wie möchtsch, dass sich öpper vo dir trennt?",
+    "Was isch dini Love Language?",
+    "Was für dis Lieblingsplüschtier säge isch dini Story (Läbesgschicht)?",
+    "Bei welcher Frage lügst du meistens?",
+    "Wann hast du das letzte Mal einen Blödsinn angestellt und wie?",
+    "Wie sorgst du für dich selbst?",
+    "Was isch für dich wertvoll?",
+    "Die 3-Frage: Wer bin ich? Wohin gehe ich? Und mit wem?",
+    "Wenn bisch du im Flow?",
+    "Was bruchts zum Gier überwinde?",
+    "Was wäre die Antwort, wenn niemand eine Frage stellt?",
+    "Woran erkennst du dich?",
+    "Wann bist du mit deinem Kind verbunden?",
+    "Was fällt dir leicht?",
+    "In welcher Form nimmst du deine Gedanken wahr?",
+    "Was ist dein Ausgleich?",
+    "Wenn du wüsstisch es wür schief gah, was würsch trotzdem mache?",
+    "Was würdest du tun, wenn du absolut keine Angst hättest?",
+    "Wie gnüssisch du dich?",
+    "Wie verstahsch und erläbsch du Disziplin?",
+    "Was isch dini versteckti Superpower?",
+    "Was begeistert dich? Wann warst du es das letzte Mal?",
   ];
   function getISOWeek() {
     const d = new Date();
@@ -2337,7 +2406,9 @@ Koh &amp; Chi</p>
     } catch (e) { return 0; }
   }
   const { week, year } = getISOWeek();
-  const frage = FRAGEN[(week + getDeviceOffset()) % FRAGEN.length];
+  // the list grew from 11 to 51 on 11 Nov 2026; the longer one starts on Monday (KW 47) so nobody's question changes mid-week
+  const NEW_LIST_FROM = 2026 * 100 + 47, devOff = getDeviceOffset();
+  const frage = year * 100 + week >= NEW_LIST_FROM ? FRAGEN[(week + devOff) % FRAGEN.length] : FRAGEN[(week + devOff % 11) % 11];
   document.getElementById('question').textContent = frage;
   document.getElementById('kw').textContent = 'KW ' + week;
   const reflection = document.getElementById('reflection');
