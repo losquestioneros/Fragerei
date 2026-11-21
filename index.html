@@ -351,10 +351,8 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 .l-title{margin:0;font-family:var(--f-disp);font-weight:var(--h-wt);font-style:var(--h-style);font-variation-settings:var(--h-var);font-size:clamp(3rem,2rem + 6vw,6.5rem);line-height:1;color:#fff;text-shadow:0 2px 4px rgba(50,50,75,.14),0 8px 26px rgba(50,50,75,.16)}
 .l-sub{margin:0;max-width:30rem;font-family:var(--f-body);font-size:clamp(1rem,.9rem + .5vw,1.25rem);line-height:1.5;color:#fff;text-wrap:balance;font-weight:600;text-shadow:0 1px 2px rgba(40,40,65,.34),0 2px 10px rgba(40,40,65,.26)}
 :root[data-v="2c"] .l-title,:root[data-v="5b"] .l-title{font-stretch:125%}
-.l-top,.l-bottom{position:absolute;left:16px;right:16px;margin:0 auto;text-align:center;opacity:0}
-.l-top{top:calc(7vh + env(safe-area-inset-top,0px))}
+.l-bottom{position:absolute;left:16px;right:16px;margin:0 auto;text-align:center;opacity:0}
 .l-bottom{bottom:calc(8vh + env(safe-area-inset-bottom,0px))}
-.l-amp{grid-area:1/1;margin:0;font-family:var(--f-body);font-weight:400;font-size:clamp(1.8rem,1.5rem + 1.2vw,2.6rem);line-height:1;color:#fff;text-shadow:0 1px 3px rgba(40,40,65,.3),0 4px 14px rgba(40,40,65,.2);opacity:0}
 :root:not(.live) .l-bottom{bottom:calc(8vh + 84px + env(safe-area-inset-bottom,0px))}
 .l-brand{grid-area:1/1;margin:0;font-family:"Space Grotesk","Helvetica Neue",Arial,sans-serif;font-weight:700;font-size:min(12rem,22vw);letter-spacing:-.02em;line-height:1;color:#fff;text-shadow:0 3px 6px rgba(50,50,75,.12),0 14px 40px rgba(50,50,75,.16);opacity:0}
 .l-end{grid-area:1/1;padding-inline:16px;text-align:center;text-wrap:balance;font-size:clamp(2.4rem,1.6rem + 5vw,5.5rem);opacity:0}
@@ -830,17 +828,12 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
   </div>
 </section>
 <div class="abyss" id="abyss" aria-hidden="true"></div>
-<section class="licht" id="licht" aria-label="Alles">
+<section class="licht" id="licht" aria-label="Das Licht">
   <div class="l-stage">
     <div class="l-circle" id="lCircle" aria-hidden="true"></div>
-    <p class="l-title l-top" id="lAlles">Alles.</p>
-    <p class="l-amp" id="lAmp">&amp;</p>
-    <div class="l-bottom l-nichts" id="lNichts">
-      <p class="l-title">Nichts.</p>
-    </div>
     <p class="l-brand" id="lBrand">Fragerei</p>
     <p class="l-sub l-bottom" id="lLight">Das Licht ist in uns allen.</p>
-    <p class="l-title l-end" id="lEnd">Lass uns leuchten.</p>
+    <p class="l-title l-end" id="lEnd">Jetzt bist du dran.</p>
   </div>
 </section>
 
@@ -1044,6 +1037,12 @@ Koh &amp; Chi</p>
   const MARIA = [[-.3, -.32, .27], [.1, -.34, .16], [.3, -.1, .19], [.36, .17, .12], [-.46, .06, .29], [-.14, .3, .17], [.04, .04, .11]];
   const MOON_CRATERS = [[-.08, .64, .08], [.52, .44, .09], [-.6, -.5, .08], [.22, .72, .055], [.6, -.4, .07], [-.32, .6, .055], [.16, -.62, .065], [-.72, .24, .06],
     [.7, .06, .055], [.36, -.74, .045], [-.42, -.74, .045], [.02, -.14, .05], [-.22, .06, .045], [.44, .66, .045], [-.55, -.15, .04], [.25, .25, .04]];
+  // the big moon's colour regions [lon, lat, radius, rgb] and the two faces in it: KOH (two antennae, two eyes) and CHI (one antenna, one big eye)
+  const MOON_TINTS = [[-.95, .45, .5, '127,224,196'], [.75, -.55, .45, '255,158,122'], [.15, .72, .4, '212,247,122'], [-.3, -.78, .38, '185,167,255'], [1.1, .2, .4, '108,99,255']];
+  const MOON_FACES = [
+    { lon: -.33, lat: .12, s: 1, hx: .2, hy: .17, ant: [[-.08, -.14, -.17, -.34], [.08, -.14, .17, -.34]], eyes: [[-.075, -.01, .048, .062], [.075, -.01, .048, .062]] },
+    { lon: .3, lat: -.16, s: .92, hx: .19, hy: .165, ant: [[.02, -.15, .08, -.36]], eyes: [[0, -.015, .075, .085]] },
+  ];
   const BIGMOON = { light: '#fff7d6', mid: '#efcf72', dark: '#8a6a1e', halo: 'rgba(255,214,110,.3)', line: 'rgba(255,205,120,.45)', edge: 'rgba(255,214,130,.9)' };
 
   // bodies out in the long universe below the content; f = position within its zone, k = parallax
@@ -1122,7 +1121,7 @@ Koh &amp; Chi</p>
   let backKey = '';
   const zones = { contentEnd: 1, abyss: 1, nichtsPad: 0, void1: { top: 0, h: 1 }, kohchi: { top: 0, h: 1 }, void2: { top: 0, h: 1 }, nichts: { top: 0, h: 1 }, licht: { top: 0, h: 1 } };
   const lCircle = document.getElementById('lCircle');
-  const lEls = { alles: document.getElementById('lAlles'), amp: document.getElementById('lAmp'), nichts: document.getElementById('lNichts'), brand: document.getElementById('lBrand'), light: document.getElementById('lLight'), end: document.getElementById('lEnd') };
+  const lEls = { brand: document.getElementById('lBrand'), light: document.getElementById('lLight'), end: document.getElementById('lEnd') };
   const hits = [];
   const pings = []; // first taps on two-tap bodies
   let mx = -1, my = -1, overUI = false, hoverId = null;
@@ -1495,54 +1494,61 @@ Koh &amp; Chi</p>
       ctx.restore();
       return;
     }
-    let g = ctx.createRadialGradient(x, y, r * .9, x, y, r * 2.2);
-    g.addColorStop(0, c.halo); g.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r * 2.2, 0, TAU); ctx.fill();
+    // a multicoloured sphere that sways a little (libration), with KOH and CHI as its dark plains
+    const spin = (reduce ? 0 : .07 * Math.sin(performance.now() / 5200)) + .22 * Math.sin(sy * .0011);
+    const proj = (lon, lat) => { const a = lon + spin; return { px: x + r * Math.cos(lat) * Math.sin(a), py: y + r * Math.sin(lat), fx: Math.cos(a), fy: Math.cos(lat) }; };
+    let g = ctx.createRadialGradient(x, y, r * .9, x, y, r * 2.4);
+    g.addColorStop(0, 'rgba(201,170,255,.34)'); g.addColorStop(.45, 'rgba(255,150,195,.14)'); g.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(x, y, r * 2.4, 0, TAU); ctx.fill();
     ctx.save();
     ctx.beginPath(); ctx.arc(x, y, r, 0, TAU); ctx.clip();
-    if (mode === 'flat') ctx.fillStyle = c.mid;
-    else {
-      g = ctx.createRadialGradient(x + cl * r * .4, y + sl * r * .4, r * .1, x, y, r * 1.05);
-      g.addColorStop(0, c.light); g.addColorStop(1, c.mid);
-      ctx.fillStyle = g;
+    g = ctx.createRadialGradient(x + cl * r * .45, y + sl * r * .45, r * .04, x + cl * r * .12, y + sl * r * .12, r * 1.15);
+    g.addColorStop(0, '#fffaf0'); g.addColorStop(.22, '#ffe2a6'); g.addColorStop(.48, '#f6a9c9'); g.addColorStop(.76, '#a48cf2'); g.addColorStop(1, '#3a1c72');
+    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+    for (const [lon, lat, rr, rgb] of MOON_TINTS) { // soft coloured regions that turn with the moon
+      const q = proj(lon, lat); if (q.fx <= 0) continue;
+      const R = rr * r * (.55 + .45 * q.fx), mg = ctx.createRadialGradient(q.px, q.py, 0, q.px, q.py, R);
+      mg.addColorStop(0, `rgba(${rgb},.34)`); mg.addColorStop(1, `rgba(${rgb},0)`);
+      ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(q.px, q.py, R, 0, TAU); ctx.fill();
     }
-    ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
-    for (const [dx, dy, rr] of MARIA) { // dark plains
-      const px = x + dx * r, py = y + dy * r, R = rr * r * (mode === 'flat' ? 1 : 1.25);
-      if (mode === 'flat') ctx.fillStyle = 'rgba(138,106,30,.32)';
-      else {
-        const mg = ctx.createRadialGradient(px, py, 0, px, py, R);
-        mg.addColorStop(0, 'rgba(150,108,28,.3)'); mg.addColorStop(.6, 'rgba(150,108,28,.22)'); mg.addColorStop(1, 'rgba(150,108,28,0)');
-        ctx.fillStyle = mg;
+    for (const f of MOON_FACES) { // KOH and CHI, faint like the man in the moon
+      const q = proj(f.lon, f.lat); if (q.fx <= .15) continue;
+      ctx.save(); ctx.translate(q.px, q.py); ctx.scale(q.fx * f.s, q.fy * f.s); ctx.globalAlpha = GA * Math.min(1, (q.fx - .15) * 3);
+      const dark = 'rgba(52,18,104,.32)', lite = 'rgba(255,246,255,.36)', u = r;
+      ctx.shadowColor = dark; ctx.shadowBlur = u * .06;
+      ctx.fillStyle = dark; ctx.strokeStyle = dark; ctx.lineCap = 'round'; ctx.lineWidth = u * .035;
+      ctx.beginPath(); ctx.ellipse(0, 0, u * f.hx, u * f.hy, 0, 0, TAU); ctx.fill();
+      for (const [ax, ay, bx, by] of f.ant) {
+        ctx.beginPath(); ctx.moveTo(ax * u, ay * u); ctx.quadraticCurveTo((ax + bx) / 2 * u + (bx - ax) * u * .6, (ay + by) / 2 * u, bx * u, by * u); ctx.stroke();
+        ctx.beginPath(); ctx.arc(bx * u, by * u, u * .04, 0, TAU); ctx.fill();
       }
-      ctx.beginPath(); ctx.arc(px, py, R, 0, TAU); ctx.fill();
+      ctx.shadowBlur = 0; ctx.fillStyle = lite; ctx.strokeStyle = lite; ctx.lineWidth = u * .022;
+      for (const [ex, ey, erx, ery] of f.eyes) { ctx.beginPath(); ctx.ellipse(ex * u, ey * u, erx * u, ery * u, 0, 0, TAU); ctx.fill(); }
+      ctx.beginPath(); ctx.arc(0, u * f.hy * .35, u * f.hx * .32, .25 * Math.PI, .75 * Math.PI); ctx.stroke();
+      ctx.restore();
     }
-    if (mode !== 'flat') { // bright rays around the big crater at the bottom
-      const tx = x + MOON_CRATERS[0][0] * r, ty = y + MOON_CRATERS[0][1] * r;
-      ctx.strokeStyle = 'rgba(255,250,225,.18)'; ctx.lineWidth = 1;
-      ctx.beginPath();
-      for (let k = 0; k < 11; k++) { const a = k * TAU / 11 + .2, L = r * (.35 + (k % 3) * .14); ctx.moveTo(tx, ty); ctx.lineTo(tx + Math.cos(a) * L, ty + Math.sin(a) * L); }
-      ctx.stroke();
+    for (const [dx, dy, rr] of MOON_CRATERS) { // craters on the sphere: shadowed wall towards the light, lit floor away from it
+      const lat = Math.asin(clamp(dy, -.98, .98)), lon = Math.asin(clamp(dx / Math.cos(lat), -.98, .98)), q = proj(lon, lat);
+      if (q.fx <= .05) continue;
+      const R = rr * r;
+      ctx.save(); ctx.translate(q.px, q.py); ctx.scale(q.fx, 1);
+      ctx.fillStyle = 'rgba(70,32,128,.3)'; ctx.beginPath(); ctx.arc(0, 0, R, 0, TAU); ctx.fill();
+      ctx.fillStyle = 'rgba(255,240,250,.45)'; ctx.beginPath(); ctx.arc(-cl * R * .24, -sl * R * .24, R * .76, 0, TAU); ctx.fill();
+      ctx.restore();
     }
-    for (const [dx, dy, rr] of MOON_CRATERS) { // shadowed wall towards the light, lit floor away from it
-      const px = x + dx * r, py = y + dy * r, R = rr * r;
-      ctx.fillStyle = 'rgba(112,78,16,.38)';
-      ctx.beginPath(); ctx.arc(px, py, R, 0, TAU); ctx.fill();
-      ctx.fillStyle = mode === 'flat' ? c.mid : 'rgba(255,244,200,.6)';
-      ctx.beginPath(); ctx.arc(px - cl * R * .24, py - sl * R * .24, R * .76, 0, TAU); ctx.fill();
-    }
+    g = ctx.createRadialGradient(x + cl * r * .5, y + sl * r * .5, 0, x + cl * r * .5, y + sl * r * .5, r * .45); // soft gloss
+    g.addColorStop(0, 'rgba(255,255,255,.4)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
     // night side: the moon slowly waxes while you scroll past
-    if (mode === 'soft') {
-      g = ctx.createLinearGradient(x + cl * r, y + sl * r, x - cl * r, y - sl * r);
-      g.addColorStop(0, `rgba(${sh},0)`); g.addColorStop(Math.max(0, phase - .12), `rgba(${sh},0)`);
-      g.addColorStop(Math.min(1, phase + .08), `rgba(${sh},.86)`); g.addColorStop(1, `rgba(${sh},.94)`);
-      ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
-    } else {
-      const d = r * phase * 2;
-      ctx.beginPath(); ctx.arc(x - cl * d, y - sl * d, r * 1.02, 0, TAU);
-      ctx.fillStyle = mode === 'flat' ? c.dark : `rgba(${sh},.9)`; ctx.fill();
-    }
+    g = ctx.createLinearGradient(x + cl * r, y + sl * r, x - cl * r, y - sl * r);
+    g.addColorStop(0, `rgba(${sh},0)`); g.addColorStop(Math.max(0, phase - .12), `rgba(${sh},0)`);
+    g.addColorStop(Math.min(1, phase + .08), `rgba(${sh},.82)`); g.addColorStop(1, `rgba(${sh},.92)`);
+    ctx.fillStyle = g; ctx.fillRect(x - r, y - r, 2 * r, 2 * r);
+    ctx.strokeStyle = 'rgba(255,246,232,.6)'; ctx.lineWidth = Math.max(1.5, r * .035); // rim light on the sunny edge
+    ctx.beginPath(); ctx.arc(x, y, r * .985, la - 1.15, la + 1.15); ctx.stroke();
     ctx.restore();
+    ctx.strokeStyle = 'rgba(201,180,255,.35)'; ctx.lineWidth = 1.2;
+    ctx.beginPath(); ctx.arc(x, y, r + 1.5, 0, TAU); ctx.stroke();
   }
 
   function drawPulsar(x, y, r, tm, u) {
@@ -1916,15 +1922,12 @@ Koh &amp; Chi</p>
     const grow = smooth(clamp(lq / .28, 0, 1)), cover = Math.hypot(W, H) / 2 * 1.05;
     lCircle.style.opacity = smooth(clamp((sy - lz.top) / (H * .3), 0, 1)).toFixed(3);
     lCircle.style.setProperty('--r', (6 * Math.pow(cover / 6, grow)).toFixed(1) + 'px');
-    // on the white: "Alles." above, the sentence below; white; Fragerei and "Wir alle sind das Licht."; white; "Lass uns leuchten."
-    const out1 = 1 - seg(lq, .45, .49), a2 = seg(lq, .55, .61) * (1 - seg(lq, .72, .76)), a3 = seg(lq, .82, .88);
-    lEls.alles.style.opacity = (seg(lq, .29, .33) * out1).toFixed(3);
-    lEls.amp.style.opacity = (seg(lq, .32, .36) * out1).toFixed(3);
-    lEls.nichts.style.opacity = (seg(lq, .35, .39) * out1).toFixed(3);
+    // on the white: Fragerei and "Das Licht ist in uns allen."; white; "Jetzt bist du dran."
+    const a2 = seg(lq, .34, .40) * (1 - seg(lq, .62, .66)), a3 = seg(lq, .74, .80);
     lEls.brand.style.opacity = lEls.light.style.opacity = a2.toFixed(3);
     lEls.end.style.opacity = a3.toFixed(3);
     if (!reduce) {
-      lEls.brand.style.transform = `scale(${(.94 + .06 * seg(lq, .55, .61) + .03 * seg(lq, .72, .76)).toFixed(3)})`;
+      lEls.brand.style.transform = `scale(${(.94 + .06 * seg(lq, .34, .40) + .03 * seg(lq, .62, .66)).toFixed(3)})`;
       lEls.end.style.transform = `scale(${(.95 + .05 * a3).toFixed(3)})`;
     }
 
