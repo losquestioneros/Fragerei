@@ -1037,12 +1037,8 @@ Koh &amp; Chi</p>
   const MARIA = [[-.3, -.32, .27], [.1, -.34, .16], [.3, -.1, .19], [.36, .17, .12], [-.46, .06, .29], [-.14, .3, .17], [.04, .04, .11]];
   const MOON_CRATERS = [[-.08, .64, .08], [.52, .44, .09], [-.6, -.5, .08], [.22, .72, .055], [.6, -.4, .07], [-.32, .6, .055], [.16, -.62, .065], [-.72, .24, .06],
     [.7, .06, .055], [.36, -.74, .045], [-.42, -.74, .045], [.02, -.14, .05], [-.22, .06, .045], [.44, .66, .045], [-.55, -.15, .04], [.25, .25, .04]];
-  // the big moon's colour regions [lon, lat, radius, rgb] and the two faces in it: KOH (two antennae, two eyes) and CHI (one antenna, one big eye)
+  // the big moon's colour regions [lon, lat, radius, rgb]
   const MOON_TINTS = [[-.95, .45, .5, '127,224,196'], [.75, -.55, .45, '255,158,122'], [.15, .72, .4, '212,247,122'], [-.3, -.78, .38, '185,167,255'], [1.1, .2, .4, '108,99,255']];
-  const MOON_FACES = [
-    { lon: -.33, lat: .12, s: 1, hx: .2, hy: .17, ant: [[-.08, -.14, -.17, -.34], [.08, -.14, .17, -.34]], eyes: [[-.075, -.01, .048, .062], [.075, -.01, .048, .062]] },
-    { lon: .3, lat: -.16, s: .92, hx: .19, hy: .165, ant: [[.02, -.15, .08, -.36]], eyes: [[0, -.015, .075, .085]] },
-  ];
   const BIGMOON = { light: '#fff7d6', mid: '#efcf72', dark: '#8a6a1e', halo: 'rgba(255,214,110,.3)', line: 'rgba(255,205,120,.45)', edge: 'rgba(255,214,130,.9)' };
 
   // bodies out in the long universe below the content; f = position within its zone, k = parallax
@@ -1494,7 +1490,7 @@ Koh &amp; Chi</p>
       ctx.restore();
       return;
     }
-    // a multicoloured sphere that sways a little (libration), with KOH and CHI as its dark plains
+    // a multicoloured sphere that sways a little (libration)
     const spin = (reduce ? 0 : .07 * Math.sin(performance.now() / 5200)) + .22 * Math.sin(sy * .0011);
     const proj = (lon, lat) => { const a = lon + spin; return { px: x + r * Math.cos(lat) * Math.sin(a), py: y + r * Math.sin(lat), fx: Math.cos(a), fy: Math.cos(lat) }; };
     let g = ctx.createRadialGradient(x, y, r * .9, x, y, r * 2.4);
@@ -1510,22 +1506,6 @@ Koh &amp; Chi</p>
       const R = rr * r * (.55 + .45 * q.fx), mg = ctx.createRadialGradient(q.px, q.py, 0, q.px, q.py, R);
       mg.addColorStop(0, `rgba(${rgb},.34)`); mg.addColorStop(1, `rgba(${rgb},0)`);
       ctx.fillStyle = mg; ctx.beginPath(); ctx.arc(q.px, q.py, R, 0, TAU); ctx.fill();
-    }
-    for (const f of MOON_FACES) { // KOH and CHI, faint like the man in the moon
-      const q = proj(f.lon, f.lat); if (q.fx <= .15) continue;
-      ctx.save(); ctx.translate(q.px, q.py); ctx.scale(q.fx * f.s, q.fy * f.s); ctx.globalAlpha = GA * Math.min(1, (q.fx - .15) * 3);
-      const dark = 'rgba(52,18,104,.32)', lite = 'rgba(255,246,255,.36)', u = r;
-      ctx.shadowColor = dark; ctx.shadowBlur = u * .06;
-      ctx.fillStyle = dark; ctx.strokeStyle = dark; ctx.lineCap = 'round'; ctx.lineWidth = u * .035;
-      ctx.beginPath(); ctx.ellipse(0, 0, u * f.hx, u * f.hy, 0, 0, TAU); ctx.fill();
-      for (const [ax, ay, bx, by] of f.ant) {
-        ctx.beginPath(); ctx.moveTo(ax * u, ay * u); ctx.quadraticCurveTo((ax + bx) / 2 * u + (bx - ax) * u * .6, (ay + by) / 2 * u, bx * u, by * u); ctx.stroke();
-        ctx.beginPath(); ctx.arc(bx * u, by * u, u * .04, 0, TAU); ctx.fill();
-      }
-      ctx.shadowBlur = 0; ctx.fillStyle = lite; ctx.strokeStyle = lite; ctx.lineWidth = u * .022;
-      for (const [ex, ey, erx, ery] of f.eyes) { ctx.beginPath(); ctx.ellipse(ex * u, ey * u, erx * u, ery * u, 0, 0, TAU); ctx.fill(); }
-      ctx.beginPath(); ctx.arc(0, u * f.hy * .35, u * f.hx * .32, .25 * Math.PI, .75 * Math.PI); ctx.stroke();
-      ctx.restore();
     }
     for (const [dx, dy, rr] of MOON_CRATERS) { // craters on the sphere: shadowed wall towards the light, lit floor away from it
       const lat = Math.asin(clamp(dy, -.98, .98)), lon = Math.asin(clamp(dx / Math.cos(lat), -.98, .98)), q = proj(lon, lat);
