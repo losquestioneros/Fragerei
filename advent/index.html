@@ -151,7 +151,7 @@ const NS = 'http://www.w3.org/2000/svg';
 const svgEl = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// the collective's 24 Advent questions, word for word (the cold question first, as the collective confirmed)
+// the collective's 24 Advent questions, with the spelling fixes they approved (the cold question first, as the collective confirmed)
 const FRAGEN = [
   'Wie geniesst du die Kälte?',
   'Was war dein längster Lachanfall-Moment? Wo & mit wem?',
@@ -160,23 +160,23 @@ const FRAGEN = [
   'Was war dein grösster Wunsch für ein Weihnachtsgeschenk in deiner Kindheit?',
   'Wie sieht deine Wunschliste an den Samichlaus heute aus?',
   'Was siehst du ALLES wenn du in den Spiegel schaust?',
-  'Was ist dein go-to samichlaus/schmutzli Sprüchli?',
-  'Was ist deine Winter-Superpower ?',
+  'Was ist dein go-to Samichlaus/Schmutzli Sprüchli?',
+  'Was ist deine Winter-Superpower?',
   'Wie feierst du dich?',
   'Wie tanzt du zu X-Mas Songs?',
   'Wie schenkst du? (Wie bist du wenn du beschenkt wirst?)',
   'Was ist dein Nordstern?',
   'Wenn dir de Samichlaus irgend ei Frag chönnti beantworte, was würsch umbedingt wele wüsse?',
   'Welches Weihnachtslied sollte nie mehr gespielt werden dürfen?',
-  'Du beschmückst den Weihnachtsbaum mit all deinen Fähigkeiten und Ressourcen: was hängt alles am Baum?',
+  'Du schmückst den Weihnachtsbaum mit all deinen Fähigkeiten und Ressourcen: was hängt alles am Baum?',
   'Wenn du ein neues Sprüchli erfinden müsstest: wie lautet es und wem würdest du es sagen? (Team Samichlaus oder Team Schmutzli?)',
-  'Welcher Wunsch darf im neuen Jahr eine Wahl werden?',
+  'Welcher Wunsch darf im neuen Jahr wahr werden?',
   'Was steht dieses Jahr über dich auf dem Zettel vom Weihnachtsmann?',
   'In all den Jahren seit dich der Weihnachtsmann kennt - wie würde er dich in mind. 5 Sätzen einer fremden Person beschreiben?',
   'Wie drückst du kulinarisch deine Liebe aus?',
-  'Was war das im Nachhinein grösstes aber unerwartetes Geschenk dieses Jahr?',
-  'Durch welches Tür(chen) willst du nächstes Jahr gehen, dass du noch nie gegangen bist?',
-  'Wie strahlst du am hellsten? Wie bringst du dein Stern zum leuchten?',
+  'Was war dein im Nachhinein grösstes, aber unerwartetes Geschenk dieses Jahr?',
+  'Durch welches Türli willst du nächstes Jahr gehen, das du noch nie gegangen bist?',
+  'Wie strahlst du am hellsten? Wie bringst du deinen Stern zum Leuchten?',
 ];
 
 const YEAR = 2026;
