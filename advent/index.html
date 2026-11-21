@@ -38,7 +38,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .sprite{position:absolute;width:0;height:0;overflow:hidden}
 .wrap{position:relative;z-index:1;max-width:560px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 .top{padding-block:28px 8px;display:grid;justify-items:center;gap:10px;text-align:center}
-.logo{width:150px;height:auto;display:block}
+.logo{width:150px;height:auto;display:block;overflow:visible;margin-bottom:8px}
 .eyebrow{margin:0;font:600 .7rem/1.3 var(--f-disp);font-stretch:125%;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
 h1{margin:0;font:800 clamp(1.9rem,1.3rem + 3vw,2.6rem)/1.02 var(--f-disp);font-stretch:125%;letter-spacing:-.03em;text-wrap:balance}
 .lead{margin:0;color:var(--ink-2);max-width:44ch}
@@ -77,6 +77,25 @@ body.pv{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 .day-ctl button:disabled{opacity:.3;cursor:default}
 .day-ctl output{min-width:10ch;text-align:center;font:700 .95rem/1 var(--f-body);color:var(--lime);font-variant-numeric:tabular-nums}
 .foot{position:relative;z-index:1;text-align:center;padding-block:0 32px;color:var(--ink-3);font-size:.84rem}
+.foot a{color:var(--ink-2)}
+.box{display:grid;gap:12px;padding:20px;border-radius:22px;background:rgba(24,10,54,.78);border:1px solid var(--line)}
+.box h2{margin:0;font:800 1.25rem/1.15 var(--f-disp);font-stretch:112%;letter-spacing:-.01em}
+.sub{margin:0;color:var(--ink-2);font-size:.95rem}
+.sub.small{font-size:.8rem;color:var(--ink-3)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:440px){.row2{grid-template-columns:1fr}}
+.fld{display:grid;gap:6px;min-width:0}
+.fld span{font-size:.8rem;font-weight:600;color:var(--ink-2)}
+.fld input{font:inherit;font-size:1rem;color:var(--ink);background:rgba(255,255,255,.06);border:1px solid var(--line-2);border-radius:12px;padding:10px 12px;width:100%;min-width:0}
+.fld input::placeholder{color:var(--ink-3)}
+.give{display:grid;gap:12px}
+.linkbox{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.linkbox code{flex:1 1 220px;min-width:0;font:600 .85rem/1.4 var(--f-body);background:rgba(0,0,0,.32);border:1px solid var(--line);padding:9px 12px;border-radius:10px;word-break:break-all;-webkit-user-select:all;user-select:all}
+.btn{display:inline-flex;align-items:center;justify-content:center;justify-self:start;border:0;border-radius:999px;padding:13px 20px;font:700 .82rem/1 var(--f-disp);font-stretch:125%;letter-spacing:.04em;cursor:pointer;text-decoration:none;background:var(--grad);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+.btn.off{background:transparent;color:var(--ink-3);border:1px dashed var(--line-2);cursor:default}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translate(-50%,16px);opacity:0;z-index:40;background:rgba(9,10,20,.94);color:var(--ink);border:1px solid var(--line-2);padding:10px 18px;border-radius:999px;font-size:.88rem;width:max-content;max-width:calc(100% - 32px);text-align:center;transition:opacity .25s,transform .25s;pointer-events:none}
+.toast.show{opacity:1;transform:translate(-50%,0)}
 @media (prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
 </style>
 
@@ -114,8 +133,8 @@ body.pv{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
     <use href="#ufo" x="145" y="9" width="130" height="42"/>
   </svg>
   <p class="eyebrow">Advent 2026</p>
-  <h1>24 Sterne, 24 Fragen</h1>
-  <p class="lead">Jeden Tag leuchtet ein Stern mehr am Baum. Tipp drauf, lies die Frage und stell sie jemandem.</p>
+  <h1 id="title">24 Sterne, 24 Fragen</h1>
+  <p class="lead" id="lead">Jeden Tag leuchtet ein Stern mehr am Baum. Tipp drauf, lies die Frage und stell sie jemandem.</p>
 </header>
 
 <main class="wrap">
@@ -128,9 +147,35 @@ body.pv{padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
     <p class="qc-foot" id="foot"></p>
   </div>
   <p class="how">Im Tram, am Znachttisch, zwischen Tür und Angel. Fröged enand!</p>
+
+  <section class="box" aria-labelledby="h-give">
+    <h2 id="h-give">Verschenken</h2>
+    <p class="sub">Schick jemandem ein eigenes Sternbild. Der Link zeigt den Namen oben am Baum.</p>
+    <form class="give" id="giveForm" novalidate>
+      <div class="row2">
+        <label class="fld"><span>Für</span><input id="fuer" type="text" maxlength="40" placeholder="Name" autocomplete="off"></label>
+        <label class="fld"><span>Von</span><input id="von" type="text" maxlength="40" placeholder="Dein Name" autocomplete="off"></label>
+      </div>
+      <div class="linkbox"><code id="giveLink">fragen.fragerei.ch/advent/</code><button class="btn" type="submit">Link kopieren</button></div>
+    </form>
+  </section>
+
+  <section class="box" aria-labelledby="h-print">
+    <h2 id="h-print">Zum Ausdrucken</h2>
+    <p class="sub">Alle 24 Fragen auf einem A4-Bogen: vorne die Nummern, hinten die Fragen. Beidseitig drucken, ausschneiden und jeden Tag eine Karte ziehen.</p>
+    <a class="btn ghost" href="https://fragen.fragerei.ch/advent/fragerei-advent-druckbogen.pdf" target="_blank" rel="noopener">Druckbogen herunterladen (PDF)</a>
+  </section>
+
+  <section class="box" aria-labelledby="h-koll">
+    <h2 id="h-koll">Kollekte</h2>
+    <p class="sub">Die Fragerei ist gratis und bleibt es. Wenn sie dir etwas wert ist, freuen wir uns über einen Beitrag, zum Beispiel einen Franken pro Stern: CHF 24. Jeder Betrag hilft.</p>
+    <a class="btn" id="kollekte" href="https://fragen.fragerei.ch" target="_blank" rel="noopener">Kollekte mit TWINT geben</a>
+    <p class="sub small" id="kollNote" hidden></p>
+  </section>
 </main>
 
-<footer class="wrap foot">fröge fröge fröge ✦ · fragen.fragerei.ch</footer>
+<footer class="wrap foot">fröge fröge fröge ✦ · <a href="https://fragen.fragerei.ch">Zur Frage der Woche</a></footer>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <div class="preview" id="preview" hidden>
   <div class="wrap">
@@ -178,6 +223,10 @@ const FRAGEN = [
   'Durch welches Türli willst du nächstes Jahr gehen, das du noch nie gegangen bist?',
   'Wie strahlst du am hellsten? Wie bringst du deinen Stern zum Leuchten?',
 ];
+
+// the collective's payment page for the Kollekte (TWINT PayLink or similar); empty = not set up yet
+const KOLLEKTE_URL = '';
+const SITE = 'https://fragen.fragerei.ch/advent/';
 
 const YEAR = 2026;
 const WD = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
@@ -237,7 +286,47 @@ function render() {
   card.classList.toggle('locked', locked);
   $('#eye').textContent = `Stern ${d} · ${long(d)}`;
   $('#q').textContent = locked ? 'Noch zu.' : FRAGEN[d - 1];
-  $('#foot').textContent = locked ? `Dieser Stern leuchtet ab ${long(d)}.` : d === 24 ? 'Frohe Weihnachten. Stell sie jemandem, der dir wichtig ist.' : 'Stell sie jemandem.';
+  $('#foot').textContent = locked ? `Dieser Stern leuchtet ab ${long(d)}.` : d === 24 ? `Frohe Weihnachten${fuer ? ', ' + fuer : ''}. Stell sie jemandem, der dir wichtig ist.` : 'Stell sie jemandem.';
+}
+
+// a personal Sternbild: ?fuer=Name&von=Name (works on the website; links are made below)
+let fuer = '', von = '';
+try { const sp = new URLSearchParams(location.search); fuer = (sp.get('fuer') || '').trim().slice(0, 40); von = (sp.get('von') || '').trim().slice(0, 40); } catch (e) {}
+if (fuer) {
+  $('#title').textContent = `Ein Sternbild für ${fuer}`;
+  if (von) $('#lead').textContent = `Von ${von}. Jeden Tag leuchtet ein Stern mehr am Baum. Tipp drauf, lies die Frage und stell sie jemandem.`;
+}
+
+// toast + copy
+const toastEl = $('#toast'); let toastT = 0;
+function toast(msg) { toastEl.textContent = msg; toastEl.classList.add('show'); clearTimeout(toastT); toastT = setTimeout(() => toastEl.classList.remove('show'), 2800); }
+function giveUrl() {
+  const p = new URLSearchParams(), f = $('#fuer').value.trim(), v = $('#von').value.trim();
+  if (f) p.set('fuer', f); if (v) p.set('von', v);
+  const q = p.toString();
+  return SITE + (q ? '?' + q : '');
+}
+function showLink() { $('#giveLink').textContent = giveUrl().replace('https://', ''); }
+$('#giveForm').addEventListener('input', showLink);
+$('#giveForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const url = giveUrl(), name = $('#fuer').value.trim();
+  const fail = () => toast('Kopieren ging nicht. Markier den Link und kopier ihn selbst.');
+  try {
+    const p = navigator.clipboard && navigator.clipboard.writeText(url);
+    if (!p) throw 0;
+    p.then(() => toast(name ? `Link für ${name} kopiert.` : 'Link kopiert.'), fail);
+  } catch (err) { fail(); }
+});
+showLink();
+
+// Kollekte: the button only works once KOLLEKTE_URL is set
+function kollekte() {
+  const a = $('#kollekte'), note = $('#kollNote');
+  if (KOLLEKTE_URL) { a.href = KOLLEKTE_URL; a.className = 'btn'; note.hidden = true; return; }
+  a.removeAttribute('href'); a.className = 'btn off'; a.textContent = 'Kollekte mit TWINT kommt bald';
+  note.hidden = !preview;
+  note.textContent = 'Fürs Kollektiv: Sobald ihr einen TWINT- oder Zahlungslink habt, kommt er in advent/index.html bei KOLLEKTE_URL. Dann wird der Knopf aktiv.';
 }
 
 // preview for the collective: open the page with #vorschau
@@ -253,6 +342,7 @@ function route() {
   document.body.classList.toggle('pv', preview);
   if (preview) setDay(Math.max(1, day));
   else { day = realDay; sel = Math.max(1, realDay); render(); }
+  kollekte();
 }
 $('#minus').addEventListener('click', () => setDay(day - 1));
 $('#plus').addEventListener('click', () => setDay(day + 1));

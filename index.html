@@ -255,6 +255,8 @@ body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);f
 
 .after{display:flex;flex-direction:column;gap:6px}
 .next-week{margin:0;color:var(--ink-2);font-size:.95rem}
+.advent-link{align-self:flex-start;margin-top:34px;padding:10px 16px;border:1px solid var(--line);border-radius:var(--r-btn);font-family:var(--f-lbl);font-size:var(--lbl-size);font-weight:var(--lbl-wt);letter-spacing:var(--lbl-track);text-transform:uppercase;color:var(--accent);text-decoration:none}
+.advent-link:hover{border-color:var(--accent)}
 .countdown{display:none}
 .collect{margin:0;color:var(--ink);font-weight:600;font-size:.98rem}
 .collect::before{content:"✦";color:var(--accent);margin-right:.5em;font-weight:400}
@@ -2408,18 +2410,60 @@ Koh &amp; Chi</p>
   const { week, year } = getISOWeek();
   // the list grew from 11 to 51 on 11 Nov 2026; the longer one starts on Monday (KW 47) so nobody's question changes mid-week
   const NEW_LIST_FROM = 2026 * 100 + 47, devOff = getDeviceOffset();
-  const frage = year * 100 + week >= NEW_LIST_FROM ? FRAGEN[(week + devOff) % FRAGEN.length] : FRAGEN[(week + devOff % 11) % 11];
+  // Advent 2026: from 1 to 24 December the hero shows the collective's question of the day (same list as /advent/)
+  const ADVENT = [
+  'Wie geniesst du die Kälte?',
+  'Was war dein längster Lachanfall-Moment? Wo & mit wem?',
+  'Wie streitest du?',
+  'Was war dein Lieblingsspielzeug?',
+  'Was war dein grösster Wunsch für ein Weihnachtsgeschenk in deiner Kindheit?',
+  'Wie sieht deine Wunschliste an den Samichlaus heute aus?',
+  'Was siehst du ALLES wenn du in den Spiegel schaust?',
+  'Was ist dein go-to Samichlaus/Schmutzli Sprüchli?',
+  'Was ist deine Winter-Superpower?',
+  'Wie feierst du dich?',
+  'Wie tanzt du zu X-Mas Songs?',
+  'Wie schenkst du? (Wie bist du wenn du beschenkt wirst?)',
+  'Was ist dein Nordstern?',
+  'Wenn dir de Samichlaus irgend ei Frag chönnti beantworte, was würsch umbedingt wele wüsse?',
+  'Welches Weihnachtslied sollte nie mehr gespielt werden dürfen?',
+  'Du schmückst den Weihnachtsbaum mit all deinen Fähigkeiten und Ressourcen: was hängt alles am Baum?',
+  'Wenn du ein neues Sprüchli erfinden müsstest: wie lautet es und wem würdest du es sagen? (Team Samichlaus oder Team Schmutzli?)',
+  'Welcher Wunsch darf im neuen Jahr wahr werden?',
+  'Was steht dieses Jahr über dich auf dem Zettel vom Weihnachtsmann?',
+  'In all den Jahren seit dich der Weihnachtsmann kennt - wie würde er dich in mind. 5 Sätzen einer fremden Person beschreiben?',
+  'Wie drückst du kulinarisch deine Liebe aus?',
+  'Was war dein im Nachhinein grösstes, aber unerwartetes Geschenk dieses Jahr?',
+  'Durch welches Türli willst du nächstes Jahr gehen, das du noch nie gegangen bist?',
+  'Wie strahlst du am hellsten? Wie bringst du deinen Stern zum Leuchten?',
+  ];
+  const now0 = new Date();
+  const adventDay = now0.getFullYear() === 2026 && now0.getMonth() === 11 && now0.getDate() <= 24 ? now0.getDate() : 0;
+  const adventSoon = !adventDay && now0 >= new Date(2026, 10, 20) && now0 < new Date(2026, 11, 1);
+  const frage = adventDay ? ADVENT[adventDay - 1] : year * 100 + week >= NEW_LIST_FROM ? FRAGEN[(week + devOff) % FRAGEN.length] : FRAGEN[(week + devOff % 11) % 11];
   document.getElementById('question').textContent = frage;
-  document.getElementById('kw').textContent = 'KW ' + week;
+  document.getElementById('kw').textContent = adventDay ? 'Stern ' + adventDay : 'KW ' + week;
+  if (adventDay || adventSoon) {
+    const link = document.createElement('a');
+    link.className = 'advent-link';
+    link.href = '/advent/';
+    link.textContent = adventDay ? 'Alle Sterne im Sternbild ✦' : 'Ab 1. Dezember: jeden Tag ein Stern ✦';
+    document.querySelector('.hero .bubble').after(link);
+  }
+  if (adventDay) {
+    document.querySelector('.hero .eyebrow span').textContent = 'Deine Adventsfrage heute';
+    document.querySelector('.next-week').firstChild.textContent = adventDay < 24 ? 'Morgen leuchtet hier der nächste Stern.' : 'Frohe Weihnachten! Morgen gibt es hier wieder die Frage der Woche.';
+  }
+  const period = adventDay ? `Advent · Stern ${adventDay}` : `Woche ${week} · ${year}`;
   const reflection = document.getElementById('reflection');
-  const reflKey = `tg_refl_${year}_w${week}`;
+  const reflKey = adventDay ? `tg_refl_advent_${year}_${adventDay}` : `tg_refl_${year}_w${week}`;
   try { const saved = localStorage.getItem(reflKey); if (saved) reflection.value = saved; } catch (e) {}
   reflection.addEventListener('input', () => { try { localStorage.setItem(reflKey, reflection.value); } catch (e) {} });
   const cd = document.getElementById('countdown');
   const pad = n => String(n).padStart(2, '0');
   function countdown() {
     const now = new Date();
-    const add = (8 - now.getDay()) % 7 || 7;
+    const add = adventDay ? 1 : (8 - now.getDay()) % 7 || 7;
     const next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + add);
     let s = Math.max(0, Math.floor((next - now) / 1000));
     const d = Math.floor(s / 86400); s %= 86400;
@@ -2462,9 +2506,9 @@ Koh &amp; Chi</p>
     const card = el('div', 'position:fixed;left:-9999px;top:0;width:600px;background:#ffffff;font-family:Manrope,sans-serif;');
     const head = el('div', 'background:linear-gradient(135deg,#6c63ff,#ff6b6b);padding:18px 28px;display:flex;justify-content:space-between;align-items:center;');
     head.append(el('span', "color:#fff;font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:700;", 'Fragerei'),
-      el('span', 'color:rgba(255,255,255,0.75);font-size:11px;', `Woche ${week} · ${year}`));
+      el('span', 'color:rgba(255,255,255,0.75);font-size:11px;', period));
     const body = el('div', 'padding:32px 28px 28px;');
-    body.append(el('div', 'font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6c63ff;margin-bottom:14px;', 'Frage dieser Woche'),
+    body.append(el('div', 'font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#6c63ff;margin-bottom:14px;', adventDay ? 'Adventsfrage' : 'Frage dieser Woche'),
       el('div', "font-family:'Space Grotesk',sans-serif;font-size:22px;font-weight:700;color:#1a1a2e;line-height:1.45;margin-bottom:28px;", frage),
       el('div', 'height:1px;background:linear-gradient(to right,transparent,#f0f0f5 20%,#f0f0f5 80%,transparent);margin-bottom:24px;'),
       el('div', 'font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#a0a0b8;margin-bottom:12px;', 'Meine Gedanken'),
@@ -2476,7 +2520,7 @@ Koh &amp; Chi</p>
     try {
       const canvas = await window.html2canvas(card, { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
       const link = document.createElement('a');
-      link.download = `Fragerei_Woche${week}_${year}.jpg`;
+      link.download = adventDay ? `Fragerei_Advent_Stern${adventDay}_${year}.jpg` : `Fragerei_Woche${week}_${year}.jpg`;
       link.href = canvas.toDataURL('image/jpeg', 0.92);
       link.click();
       toast('JPEG wird heruntergeladen ✓');
@@ -2519,7 +2563,7 @@ Koh &amp; Chi</p>
   sendFrageBtn.addEventListener('click', () => submit(sendFrageBtn, document.getElementById('frageInput'), 'Schreib zuerst deine Frage…', 'Frage einreichen',
     text => ({ typ: 'Frage-Vorschlag', frage_vorschlag: text }), 'Danke für deine Frage! ✦'));
   sendStoryBtn.addEventListener('click', () => submit(sendStoryBtn, document.getElementById('story'), 'Schreib zuerst deine Geschichte…', 'Geschichte teilen',
-    text => ({ frage, woche: `Woche ${week} · ${year}`, geschichte: text }), 'Danke für deine Geschichte! ✦'));
+    text => ({ frage, woche: period, geschichte: text }), 'Danke für deine Geschichte! ✦'));
 
   /* ---------- start ---------- */
   if (LIVE) {
