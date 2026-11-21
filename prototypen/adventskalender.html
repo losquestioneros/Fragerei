@@ -407,7 +407,7 @@ td{color:var(--ink-2)}
   </svg>
   <p class="eyebrow">Adventskalender 2026 · Fünf Prototypen</p>
   <h1>24 Türli.<br><span>24 Fragen.</span></h1>
-  <p class="lead">So könnte ein Fragerei-Adventskalender aussehen und bestellt werden. Jeder Prototyp zeigt den Kalender und den Weg, wie man ihn verschenkt, bucht oder in Auftrag gibt. Mit dem Vorschau-Tag oben springst du in den Dezember. Preise, Fristen und Fragen sind Vorschläge; es wird nichts bestellt oder gesendet.</p>
+  <p class="lead">So könnte ein Fragerei-Adventskalender aussehen und bestellt werden. Jeder Prototyp zeigt den Kalender und den Weg, wie man ihn verschenkt, bucht oder in Auftrag gibt. Mit dem Vorschau-Tag oben springst du in den Dezember. Die 24 Adventsfragen sind eure. Preise, Fristen und die Beispielfragen in den Prototypen 2, 4 und 5 sind Vorschläge; es wird nichts bestellt oder gesendet.</p>
 </header>
 
 <nav class="nav" aria-label="Prototypen">
@@ -473,18 +473,10 @@ td{color:var(--ink-2)}
             <p class="note">Beispielnamen. Überschreib sie, das Sternbild passt sich an.</p>
           </div>
         </li>
-        <li><h4>Wie sollen die Fragen klingen?</h4>
+        <li><h4>Ein persönlicher Gruss?</h4>
           <div class="body">
-            <fieldset class="seg"><legend>Sprache</legend><div class="opts">
-              <label class="opt"><input type="radio" name="p1lang" value="m" checked><span>Mundart</span></label>
-              <label class="opt"><input type="radio" name="p1lang" value="h"><span>Hochdeutsch</span></label>
-            </div></fieldset>
-            <fieldset class="seg"><legend>Tiefe</legend><div class="opts">
-              <label class="opt"><input type="radio" name="p1depth" value="leicht"><span>Leicht</span></label>
-              <label class="opt"><input type="radio" name="p1depth" value="gemischt" checked><span>Gemischt</span></label>
-              <label class="opt"><input type="radio" name="p1depth" value="tief"><span>Tief</span></label>
-            </div></fieldset>
-            <label class="fld"><span>Deine eigene Frage für den 24. Dezember <em class="opt-lbl">(freiwillig)</em></span><textarea id="p1own" rows="2" placeholder="Zum Beispiel: Was wünschsch du dir vo mir?"></textarea></label>
+            <label class="fld"><span>Dein Gruss zum 24. Dezember <em class="opt-lbl">(freiwillig)</em></span><textarea id="p1own" rows="2" placeholder="Zum Beispiel: Schön, dass es dich gibt."></textarea></label>
+            <p class="note">Er erscheint am 24. unter der letzten Frage. Die 24 Fragen kommen vom Kollektiv.</p>
           </div>
         </li>
         <li><h4>Wie kommt es an?</h4>
@@ -658,12 +650,8 @@ td{color:var(--ink-2)}
             <label class="choice"><input type="radio" name="p3prod" value="box"><b>Kartenbox mit 24 Karten</b><small>Jeden Tag eine Karte ziehen, auf den Tisch legen, weitergeben.</small><span class="pr">CHF 39.–</span></label>
           </div>
         </li>
-        <li><h4>Sprache und Anzahl</h4>
+        <li><h4>Wie viele?</h4>
           <div class="body">
-            <fieldset class="seg"><legend>Sprache</legend><div class="opts">
-              <label class="opt"><input type="radio" name="p3lang" value="m" checked><span>Mundart</span></label>
-              <label class="opt"><input type="radio" name="p3lang" value="h"><span>Hochdeutsch</span></label>
-            </div></fieldset>
             <div class="fld"><span id="p3QtyLbl">Anzahl</span>
               <div class="stepper" role="group" aria-labelledby="p3QtyLbl"><button type="button" id="p3Minus" aria-label="Eins weniger">−</button><output id="p3Qty">1</output><button type="button" id="p3Plus" aria-label="Eins mehr">+</button></div>
               <p class="note">Ab 5 Stück 10 % günstiger, ab 10 Stück 15 %. Gut für Schulklassen und Büros.</p>
@@ -955,32 +943,32 @@ function copy(text) {
 }
 
 /* ---------- questions ---------- */
-// [Mundart, Hochdeutsch]; mixes the Fragerei list with winter questions; 21 Dec is the longest night
+// the collective's 24 Advent questions, word for word (same list as the Sternbild test page)
 const ADV = [
-  ['Was isch dis liebste Winterritual?', 'Was ist dein liebstes Winterritual?'],
-  ['Wem möchtsch du dis Jahr no Danke säge?', 'Wem möchtest du dieses Jahr noch Danke sagen?'],
-  ['Weles Gschmäckli bringt di zrugg i dini Chindheit?', 'Welcher Duft bringt dich zurück in deine Kindheit?'],
-  ['Was häsch dis Jahr glernt, wo du nöd erwartet häsch?', 'Was hast du dieses Jahr gelernt, womit du nicht gerechnet hast?'],
-  ['Was git dir Wärmi a me graue Tag?', 'Was gibt dir Wärme an einem grauen Tag?'],
-  ['Weles Gschänk häsch nie vergässe – und wieso?', 'Welches Geschenk hast du nie vergessen – und warum?'],
-  ['Wo fühlsch du dich dihei?', 'Wo fühlst du dich zuhause?'],
-  ['Was würdsch mache, wenn niemer zueluegt?', 'Was würdest du tun, wenn niemand zuschaut?'],
-  ['Was möchtsch du dis Jahr no loslah?', 'Was möchtest du dieses Jahr noch loslassen?'],
-  ['Weles Lied ghört für di zum Winter?', 'Welches Lied gehört für dich zum Winter?'],
-  ['Wem wotsch scho lang öppis säge?', 'Wem willst du schon lange etwas sagen?'],
-  ['Wänn häsch s’letscht Mal öppis zum erschte Mal gmacht?', 'Wann hast du zum letzten Mal etwas zum ersten Mal gemacht?'],
-  ['Was isch dini versteckti Superpower?', 'Was ist deine versteckte Superkraft?'],
-  ['Weli Tradition würsch gern neu erfinde?', 'Welche Tradition würdest du gerne neu erfinden?'],
-  ['Was hät di als Chind glücklich gmacht – und macht’s das hüt no?', 'Was hat dich als Kind glücklich gemacht – und tut es das heute noch?'],
-  ['Wie zeigsch du Liebi uf Distanz?', 'Wie zeigst du Liebe auf Distanz?'],
-  ['Was würsch mache, wenn du absolut kei Angscht hättsch?', 'Was würdest du tun, wenn du absolut keine Angst hättest?'],
-  ['Wer hät dis Jahr heller gmacht?', 'Wer hat dein Jahr heller gemacht?'],
-  ['Was wünschsch du dir, wo mer nöd cha chaufe?', 'Was wünschst du dir, das man nicht kaufen kann?'],
-  ['Was isch für di wertvoll?', 'Was ist für dich wertvoll?'],
-  ['Was lüchtet i dir, au wenn’s niemer gseht?', 'Was leuchtet in dir, auch wenn es niemand sieht?'],
-  ['Wänn bisch du s’letscht Mal so richtig stolz gsi uf dich?', 'Wann warst du das letzte Mal so richtig stolz auf dich?'],
-  ['Was nimmsch mit is nöchste Jahr?', 'Was nimmst du mit ins nächste Jahr?'],
-  ['Wo lüchtisch du – und für wen?', 'Wo leuchtest du – und für wen?'],
+  'Was war dein längster Lachanfall-Moment? Wo & mit wem?',
+  'Wie streitest du?',
+  'Was war dein Lieblingsspielzeug?',
+  'Was war dein grösster Wunsch für ein Weihnachtsgeschenk in deiner Kindheit?',
+  'Wie sieht deine Wunschliste an den Samichlaus heute aus?',
+  'Was siehst du ALLES wenn du in den Spiegel schaust?',
+  'Was ist dein go-to samichlaus/schmutzli Sprüchli?',
+  'Was ist deine Winter-Superpower ?',
+  'Wie feierst du dich?',
+  'Wie tanzt du zu X-Mas Songs?',
+  'Wie schenkst du? (Wie bist du wenn du beschenkt wirst?)',
+  'Was ist dein Nordstern?',
+  'Wenn dir de Samichlaus irgend ei Frag chönnti beantworte, was würsch umbedingt wele wüsse?',
+  'Welches Weihnachtslied sollte nie mehr gespielt werden dürfen?',
+  'Du beschmückst den Weihnachtsbaum mit all deinen Fähigkeiten und Ressourcen: was hängt alles am Baum?',
+  'Wenn du ein neues Sprüchli erfinden müsstest: wie lautet es und wem würdest du es sagen? (Team Samichlaus oder Team Schmutzli?)',
+  'Welcher Wunsch darf im neuen Jahr eine Wahl werden?',
+  'Was steht dieses Jahr über dich auf dem Zettel vom Weihnachtsmann?',
+  'In all den Jahren seit dich der Weihnachtsmann kennt - wie würde er dich in mind. 5 Sätzen einer fremden Person beschreiben?',
+  'Wie drückst du kulinarisch deine Liebe aus?',
+  'Was war das im Nachhinein grösstes aber unerwartetes Geschenk dieses Jahr?',
+  'Durch welches Tür(chen) willst du nächstes Jahr gehen, dass du noch nie gegangen bist?',
+  'Wie geniesst du die Kälte?',
+  'Wie strahlst du am hellsten? Wie bringst du dein Stern zum leuchten?',
 ];
 const TEAM = [
   'Was hat dich dieses Jahr bei der Arbeit überrascht?',
@@ -1076,7 +1064,7 @@ const p1Stars = TREE.map(([x, y], i) => {
   return g;
 });
 function p1Render() {
-  const to = val(p1to, 'Andrea'), from = val(p1from, 'Lena'), lang = radio('p1lang') === 'h' ? 1 : 0;
+  const to = val(p1to, 'Andrea'), from = val(p1from, 'Lena');
   bind('p1to', to);
   lit.setAttribute('points', TREE.slice(0, day).map(p => p.join(',')).join(' '));
   p1Stars.forEach((g, i) => {
@@ -1088,15 +1076,14 @@ function p1Render() {
   $('#p1Card').classList.toggle('locked', locked);
   $('#p1Eye').textContent = `Stern ${d} · ${long(d)}${d === 21 ? ' · längste Nacht' : ''}`;
   if (locked) { $('#p1Q').textContent = 'Noch zu.'; $('#p1Foot').textContent = `Dieser Stern leuchtet ab ${long(d)}.`; return; }
-  if (d === 24 && own) { $('#p1Q').textContent = own; $('#p1Foot').textContent = `Eine Frage von ${from}. Frohe Weihnachten, ${to}.`; return; }
-  $('#p1Q').textContent = ADV[d - 1][lang];
-  $('#p1Foot').textContent = d === 24 ? `Frohe Weihnachten, ${to}. Stell sie jemandem, der dir wichtig ist.` : 'Stell sie jemandem. Im Tram, am Znachttisch, zwischen Tür und Angel.';
+  $('#p1Q').textContent = ADV[d - 1];
+  $('#p1Foot').textContent = d === 24 ? (own ? `Gruss von ${from}: ${own}` : `Frohe Weihnachten, ${to}. Stell sie jemandem, der dir wichtig ist.`) : 'Stell sie jemandem. Im Tram, am Znachttisch, zwischen Tür und Angel.';
 }
 $('#p1Form').addEventListener('input', () => { $('#p1mailF').hidden = radio('p1deliver') !== 'mail'; p1Render(); });
 $('#p1Form').addEventListener('submit', e => {
   e.preventDefault();
   const to = val(p1to, 'Andrea'), from = val(p1from, 'Lena'), link = `fragen.fragerei.ch/advent/${slug(to)}-${rnd(4)}`;
-  const give = +radio('p1give'), how = radio('p1deliver'), depth = radio('p1depth');
+  const give = +radio('p1give'), how = radio('p1deliver');
   $('#p1DoneH').textContent = `Das Sternbild für ${to} ist bereit.`;
   $('#p1Link').textContent = link;
   const ways = {
@@ -1104,7 +1091,7 @@ $('#p1Form').addEventListener('submit', e => {
     mail: `${to} bekommt ab 1. Dezember jeden Morgen um 7 Uhr eine Mail von ${from}.`,
     app: `${to} öffnet den Link einmal, legt die Fragerei auf den Homescreen und erlaubt Mitteilungen.`,
   };
-  $('#p1DoneP').textContent = `${ways[how]} Fragen: ${radio('p1lang') === 'h' ? 'Hochdeutsch' : 'Mundart'}, ${depth}.` + (give ? ` Danke für deine ${chf(give)} ans Kollektiv.` : '');
+  $('#p1DoneP').textContent = ways[how] + (give ? ` Danke für deine ${chf(give)} ans Kollektiv.` : '');
   $('#p1Done').hidden = false;
 });
 $('#p1Copy').addEventListener('click', () => copy($('#p1Link').textContent));
@@ -1218,7 +1205,7 @@ function p3Layout() {
   });
 }
 function p3Render() {
-  const lang = radio('p3lang') === 'h' ? 1 : 0, prod = radio('p3prod'), box = prod === 'box';
+  const prod = radio('p3prod'), box = prod === 'box';
   for (let d = 1; d <= 24; d++) {
     const b = p3Btns[d];
     b.classList.toggle('open', p3.open.has(d)); b.classList.toggle('today', d === day && !p3.open.has(d));
@@ -1229,7 +1216,7 @@ function p3Render() {
   $('#p3Card').style.setProperty('--c', COLORS[d % 4]);
   $('#p3N').textContent = `${box ? 'Karte' : 'Türli'} ${d} · ${long(d)}`;
   const unit0 = box ? 'Karte' : 'Türli';
-  $('#p3Q').textContent = shown ? ADV[d - 1][lang] : d === day ? `Heute ist ${unit0} ${d} dran. Tipp drauf.` : `${unit0} ${d} ist wieder zu. Tipp drauf, um es zu öffnen.`;
+  $('#p3Q').textContent = shown ? ADV[d - 1] : d === day ? `Heute ist ${unit0} ${d} dran. Tipp drauf.` : `${unit0} ${d} ist wieder zu. Tipp drauf, um es zu öffnen.`;
   // price
   const unit = box ? 39 : 29, q = p3.qty, disc = q >= 10 ? .15 : q >= 5 ? .1 : 0, ship = radio('p3ship');
   const lines = [[`${q} × ${box ? 'Kartenbox' : 'Poster A2'} à ${chf(unit)}`, unit * q]];
@@ -1256,7 +1243,7 @@ $('#p3Form').addEventListener('submit', e => {
   e.preventDefault();
   const ship = radio('p3ship'), box = radio('p3prod') === 'box';
   $('#p3No').textContent = `FR-P-${rnd(4).toUpperCase()}`;
-  $('#p3DoneP').textContent = `${p3.qty} × ${box ? 'Kartenbox' : 'Poster'} in ${radio('p3lang') === 'h' ? 'Hochdeutsch' : 'Mundart'}. Im echten Shop folgt jetzt die Zahlung mit ${radio('p3pay')}, danach ` +
+  $('#p3DoneP').textContent = `${p3.qty} × ${box ? 'Kartenbox' : 'Poster'}. Im echten Shop folgt jetzt die Zahlung mit ${radio('p3pay')}, danach ` +
     (ship === 'pick' ? 'eine Nachricht, sobald alles in Winterthur abholbereit ist.' : `der Versand per ${ship === 'a' ? 'A-Post' : 'B-Post'} mit Sendungsnummer.`);
   $('#p3Done').hidden = false;
 });
@@ -1338,7 +1325,7 @@ function p4Render() {
   let eye = `Türli ${d} · ${long(d)}`, q, foot, locked = false;
   if (rec && d > day) { locked = true; q = 'Noch zu.'; foot = `Öffnet sich am ${long(d)}.`; }
   else if (s) { q = s[1]; foot = `Eine Frage von ${s[0]}.`; }
-  else if (rec && auto) { q = ADV[d - 1][0]; foot = 'Aus der Fragerei, weil dieses Türli frei geblieben ist.'; }
+  else if (rec && auto) { q = ADV[d - 1]; foot = 'Aus der Fragerei, weil dieses Türli frei geblieben ist.'; }
   else { locked = true; q = 'Noch frei.'; foot = 'Teile den Link oder füll es unten selbst.'; }
   card.classList.toggle('locked', locked);
   $('#p4Eye').textContent = eye; $('#p4Q').textContent = q; $('#p4Foot').textContent = foot;
