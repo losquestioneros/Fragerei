@@ -151,8 +151,9 @@ const NS = 'http://www.w3.org/2000/svg';
 const svgEl = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); if (parent) parent.appendChild(e); return e; };
 const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// the collective's 24 Advent questions, word for word (23 as given in the message, see Traktandenliste)
+// the collective's 24 Advent questions, word for word (the cold question first, as the collective confirmed)
 const FRAGEN = [
+  'Wie geniesst du die Kälte?',
   'Was war dein längster Lachanfall-Moment? Wo & mit wem?',
   'Wie streitest du?',
   'Was war dein Lieblingsspielzeug?',
@@ -175,7 +176,6 @@ const FRAGEN = [
   'Wie drückst du kulinarisch deine Liebe aus?',
   'Was war das im Nachhinein grösstes aber unerwartetes Geschenk dieses Jahr?',
   'Durch welches Tür(chen) willst du nächstes Jahr gehen, dass du noch nie gegangen bist?',
-  'Wie geniesst du die Kälte?',
   'Wie strahlst du am hellsten? Wie bringst du dein Stern zum leuchten?',
 ];
 
