@@ -1,0 +1,1140 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fragerei Adventszeit · Samichlaus im All</title>
+<meta name="theme-color" content="#0d0420">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Fragerei Adventszeit">
+<meta property="og:description" content="Ein Adventskalender zum Verschenken: Der Samichlaus ist mit einem Satelliten zusammengestossen, 24 Päckli schweben im All. In jedem wartet eine Frage.">
+<meta property="og:image" content="https://fragen.fragerei.ch/icon-512.png">
+<meta property="og:url" content="https://fragen.fragerei.ch/advent.html">
+<meta name="description" content="Fragerei-Adventskalender: Der Samichlaus ist mit einem Satelliten zusammengestossen, 24 Päckli schweben im All. Jeden Tag fängst du eines mit dem Netz ein.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=Manrope:wght@400..700&family=Space+Grotesk:wght@700&display=swap">
+<style>
+:root{
+  /* Layout: one column on the Fragerei night sky; a square canvas stage (Samichlaus in the middle, each Päckli as far away as its seconds), a HUD with target and clock above, the sack and switches below, a dialog for the question */
+  color-scheme:dark;
+  --sky:#0d0420; --panel:#170a33; --ink:#fff3f5; --ink-2:rgba(255,243,245,.8); --ink-3:rgba(255,243,245,.56);
+  --line:rgba(255,243,245,.16); --line-2:rgba(255,243,245,.3);
+  --lime:#d4f77a; --lilac:#b9a7ff; --mint:#7fe0c4; --gold:#ffd36b; --coral:#ff9e7a; --rose:#ff9a9a; --red:#e2463f; --deep:#1d0a33;
+  --grad:linear-gradient(115deg,#5a4ff0,#a83cc0 52%,#d23c63);
+  --f-disp:"Archivo","Arial Black",sans-serif; --f-body:"Manrope",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{background:var(--sky)}
+body{margin:0;background:var(--sky);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+:focus-visible{outline:2px solid var(--lime);outline-offset:3px}
+.nebula{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(55% 40% at 12% 12%,rgba(90,79,240,.26),transparent 70%),radial-gradient(45% 38% at 92% 52%,rgba(210,60,99,.16),transparent 70%),radial-gradient(70% 50% at 50% 112%,rgba(168,60,192,.2),transparent 70%)}
+.wrap{position:relative;z-index:1;max-width:640px;margin-inline:auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.top{padding-block:24px 4px;display:grid;justify-items:center;gap:8px;text-align:center}
+.eyebrow{margin:0;font:600 .7rem/1.3 var(--f-disp);font-stretch:125%;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-3)}
+h1{margin:0;font:800 clamp(2rem,1.3rem + 3.4vw,3rem)/1 var(--f-disp);font-stretch:125%;letter-spacing:-.035em;text-wrap:balance}
+h1 span{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{margin:0;color:var(--ink-2);max-width:46ch;text-wrap:pretty}
+.steps{list-style:none;margin:10px 0 0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;width:100%;text-align:left;counter-reset:s}
+.steps li{min-width:0;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:.84rem;line-height:1.45;color:var(--ink-2)}
+.steps b{display:block;margin-bottom:3px;font:800 .7rem/1.2 var(--f-disp);font-stretch:125%;letter-spacing:.12em;text-transform:uppercase;color:var(--lime)}
+.steps b::before{counter-increment:s;content:counter(s) " · "}
+@media (max-width:540px){.steps{grid-template-columns:1fr}}
+.hud{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;padding-block:16px 8px}
+.hud .tg{flex:1;min-width:0;font-weight:700;font-size:.9rem;color:var(--ink-2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hud .tg small{display:block;font:600 .64rem/1.3 var(--f-disp);font-stretch:125%;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.clock{flex:none;font:800 1.6rem/1 var(--f-disp);font-stretch:112%;color:var(--lime);font-variant-numeric:tabular-nums}
+.clock.blind{color:var(--ink-3);font-size:1rem;letter-spacing:.12em;text-transform:uppercase}
+.clock.help{color:var(--gold)}
+.clock.over{color:var(--coral)}
+.skyfx{position:fixed;inset:0;z-index:0;width:100%;height:100%;display:block;pointer-events:none}
+/* the stage spans the whole width and has no frame: the starry sky behind it is the page's own */
+.stage{position:relative;width:100vw;margin-left:calc(50% - 50vw);height:min(100vw,680px,calc(100vh - 150px));height:min(100vw,680px,calc(100svh - 150px));min-height:300px;overflow:hidden;background:radial-gradient(circle closest-side,rgba(90,79,240,.16),transparent);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;cursor:crosshair}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.stage:focus-visible{outline-offset:-4px}
+.status{margin:12px 0 0;min-height:3em;text-align:center;font-weight:700;color:var(--ink);text-wrap:balance}
+.status.good{color:var(--lime)}
+.status.bad{color:var(--coral)}
+.box{display:grid;gap:12px;margin-top:14px;padding:18px;border-radius:22px;background:rgba(24,10,54,.78);border:1px solid var(--line)}
+.box-top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.box h2{margin:0;font:800 1.15rem/1.15 var(--f-disp);font-stretch:112%}
+.box-top span{font-size:.86rem;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.chips{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px}
+@media (max-width:540px){.chips{grid-template-columns:repeat(8,minmax(0,1fr))}}
+.chip{aspect-ratio:1/1;min-width:0;padding:0;border-radius:10px;border:1px dashed var(--line-2);background:transparent;color:var(--ink-3);font:800 .8rem/1 var(--f-disp);display:grid;place-items:center;cursor:default}
+.chip.got{border:0;background:var(--c);color:var(--deep);cursor:pointer}
+.chip.esel{border-style:solid}
+.note{margin:0;font-size:.84rem;color:var(--ink-3)}
+.score{margin:0;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline;font-variant-numeric:tabular-nums;color:var(--ink-2);font-size:.9rem}
+.score b{font:800 1.25rem/1 var(--f-disp);font-stretch:112%;color:var(--gold)}
+.row{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center}
+.switch{display:flex;align-items:center;gap:8px;font-size:.88rem;color:var(--ink-2);cursor:pointer}
+.switch input{width:18px;height:18px;accent-color:var(--lime)}
+.btn{display:inline-flex;align-items:center;justify-content:center;min-height:44px;border:0;border-radius:999px;padding:12px 20px;font:700 .82rem/1 var(--f-disp);font-stretch:125%;letter-spacing:.04em;cursor:pointer;background:var(--grad);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line-2)}
+.btn.warn{border-color:var(--coral);color:var(--coral)}
+.foot{position:relative;z-index:1;text-align:center;padding-block:22px 32px;color:var(--ink-3);font-size:.84rem}
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px max(16px,env(safe-area-inset-right,0px)) 16px max(16px,env(safe-area-inset-left,0px));background:rgba(8,3,20,.74);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+.panel{width:min(460px,100%);max-height:calc(100% - 8px);overflow:auto;background:var(--panel);border:1px solid var(--line-2);border-radius:24px;padding:18px;display:grid;gap:12px;box-shadow:0 30px 80px -20px rgba(0,0,0,.8)}
+.p-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.p-head .eyebrow{color:var(--ink-2)}
+.x{flex:none;width:40px;height:40px;border-radius:50%;border:1px solid var(--line-2);background:transparent;color:var(--ink);font:700 1.1rem/1 var(--f-body);cursor:pointer}
+.qcard{background:linear-gradient(#fff,#fff) padding-box,var(--grad) border-box;border:3px solid transparent;border-radius:24px;padding:20px 20px 16px;color:var(--deep);display:grid;gap:10px}
+.qcard .q{margin:0;font:800 clamp(1.3rem,1rem + 1.4vw,1.8rem)/1.12 var(--f-disp);font-stretch:112%;letter-spacing:-.02em;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;text-wrap:balance}
+.qcard .f{margin:0;font-size:.88rem;color:#7a6a8e}
+.alabel{font-size:.86rem;font-weight:600;color:var(--ink-2)}
+.alabel small{font-weight:500;color:var(--ink-3)}
+textarea{font:inherit;font-size:1rem;color:var(--ink);background:rgba(255,255,255,.06);border:1px solid var(--line-2);border-radius:14px;padding:10px 12px;width:100%;min-height:90px;resize:vertical}
+textarea::placeholder{color:var(--ink-3)}
+.acts{display:flex;flex-wrap:wrap;gap:8px}
+.sum-list{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.sum-list li{display:grid;gap:4px;padding:12px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid var(--line)}
+.sum-list .sn{font:700 .64rem/1.2 var(--f-disp);font-stretch:125%;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.sum-list .sq{margin:0;font-weight:700;font-size:.9rem}
+.sum-list .sa{margin:0;font-size:.95rem;color:var(--lime);white-space:pre-wrap}
+.sum-list .sa.empty{color:var(--ink-3);font-style:italic}
+/* only as a gift: the form, the Kollekte, the toast, the preview bar */
+.stage.teaser{cursor:default}
+.notice{margin:14px 0 0;padding:12px 16px;border-radius:14px;background:rgba(255,158,122,.12);border:1px solid rgba(255,158,122,.45);font-size:.92rem}
+.extra{display:grid;gap:14px;padding-top:14px}
+.box.main{border-color:rgba(212,247,122,.45);box-shadow:0 0 0 1px rgba(212,247,122,.12),0 24px 60px -30px rgba(212,247,122,.35)}
+.box .btn{justify-self:start}
+.sub{margin:0;color:var(--ink-2);font-size:.95rem}
+.sub.small{font-size:.8rem;color:var(--ink-3)}
+.got{margin:0;text-align:center;font-size:.88rem;color:var(--ink-3)}
+.row2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:440px){.row2{grid-template-columns:1fr}}
+.fld{display:grid;gap:6px;min-width:0}
+.fld span{font-size:.8rem;font-weight:600;color:var(--ink-2)}
+.fld input{font:inherit;font-size:1rem;color:var(--ink);background:rgba(255,255,255,.06);border:1px solid var(--line-2);border-radius:12px;padding:10px 12px;width:100%;min-width:0}
+.fld input::placeholder{color:var(--ink-3)}
+.fld input[aria-invalid="true"]{border-color:var(--coral)}
+.err{margin:0;color:var(--coral);font-size:.85rem}
+.give{display:grid;gap:12px}
+.done{display:grid;gap:10px;padding-top:14px;border-top:1px solid var(--line)}
+.done-t{margin:0;font-weight:700}
+.linkbox code{display:block;min-width:0;font:600 .82rem/1.45 var(--f-body);background:rgba(0,0,0,.32);border:1px solid var(--line);padding:9px 12px;border-radius:10px;word-break:break-all;-webkit-user-select:all;user-select:all}
+.btn.off{background:transparent;color:var(--ink-3);border:1px dashed var(--line-2);cursor:default}
+.amounts{display:flex;flex-wrap:wrap;gap:8px}
+.amt{border:1px solid var(--line-2);background:transparent;color:var(--ink);border-radius:999px;padding:10px 16px;font:700 .9rem/1 var(--f-body);cursor:pointer;font-variant-numeric:tabular-nums}
+.amt[aria-pressed="true"]{background:var(--lime);border-color:var(--lime);color:var(--sky)}
+.amt-own{max-width:220px}
+.linkish{background:none;border:0;padding:0;color:var(--ink-3);font:inherit;font-size:.8rem;text-decoration:underline;cursor:pointer}
+.foot{display:grid;justify-items:center;gap:8px}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));z-index:60;transform:translate(-50%,16px);opacity:0;max-width:calc(100% - 32px);padding:10px 16px;border-radius:999px;background:var(--ink);color:var(--sky);font-weight:700;font-size:.9rem;text-align:center;pointer-events:none;transition:opacity .25s,transform .25s}
+.toast.on{opacity:1;transform:translate(-50%,0)}
+body.pv{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+body.pv .toast{bottom:calc(104px + env(safe-area-inset-bottom,0px))}
+.preview{position:fixed;left:0;right:0;bottom:0;z-index:20;background:rgba(13,4,32,.9);-webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.preview .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px 12px;padding-block:10px;flex-wrap:wrap}
+.preview p{margin:0;font-size:.8rem;color:var(--ink-3)}
+.seg{display:flex;gap:4px;flex-wrap:wrap}
+.seg button{border:1px solid var(--line-2);background:transparent;color:var(--ink-2);border-radius:999px;padding:7px 12px;font:600 .78rem/1 var(--f-body);cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--sky)}
+/* the opening fills the screen: the page steps back, only the sky and the stage remain */
+.top,.foot,#notice,#hud,#status,#sackBox,.extra,.preview{transition:opacity .6s,visibility 0s}
+body.introing :is(.top,.foot,#notice,#hud,#status,#sackBox,.extra,.preview){opacity:0;visibility:hidden}
+.stage.full{position:fixed;z-index:41;inset:0;width:auto;height:auto;min-height:0;margin:0;background:transparent;cursor:pointer}
+.stage.settle{animation:settle .7s ease-out}
+@keyframes settle{from{opacity:.2}to{opacity:1}}
+.skip{position:fixed;z-index:42;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+body.introing{overflow:hidden}
+body.introing .wrap{z-index:auto}
+@media (prefers-reduced-motion:reduce){.toast,.top,.foot,#notice,#hud,#status,#sackBox,.extra,.preview{transition:none}.stage.settle{animation:none}}
+</style>
+</head>
+<body>
+
+<div class="nebula" aria-hidden="true"></div>
+<canvas class="skyfx" id="sky" aria-hidden="true"></canvas>
+
+<header class="wrap top">
+  <p class="eyebrow" id="eyebrow">Advent 2026 · 24 Päckli · 24 Fragen</p>
+  <h1 id="title">Samichlaus <span>im All</span></h1>
+  <p class="lead" id="leadGate" hidden>Ein Adventskalender im All: 24 Päckli, in jedem eine Frage, vom 1. bis 24. Dezember. Diesen Kalender kann man nicht einfach anschauen. Man bekommt ihn geschenkt oder man verschenkt ihn.</p>
+  <p class="lead" id="lead">Der Samichlaus ist mit seinen Rentieren in einen Satelliten gekracht. Der Sack ist geplatzt, 24 Päckli schweben im All. Fang jeden Tag eines mit dem Netz ein. In jedem wartet eine Frage.</p>
+  <ol class="steps" id="steps">
+    <li><b>Zielen</b>Finger oder Maus in Richtung Päckli halten. Am Computer geht auch die Leertaste, zielen mit den Pfeiltasten.</li>
+    <li><b>Blind halten</b>Die Uhr läuft eine halbe Sekunde mit. Dann zählst du im Kopf weiter, solange lädt sich das Netz auf.</li>
+    <li><b>Loslassen</b>Päckli 7 schwebt 7 Sekunden weit weg: Lass zwischen 6 und 7 Sekunden los, nie später. Ab Päckli 11 zählen Zehntel, Päckli 12 liegt bei 1,2 Sekunden.</li>
+  </ol>
+</header>
+
+<main class="wrap">
+  <p class="notice" id="notice" role="alert" hidden>Dieser Geschenk-Link ist nicht vollständig. Bitte die Person, die ihn dir geschickt hat, um den ganzen Link.</p>
+  <div class="hud" id="hud">
+    <p class="tg" id="target" style="margin:0"><small>Ziel</small>Halte in Richtung eines Päcklis</p>
+    <span class="clock" id="clock" aria-live="off">0,00 s</span>
+  </div>
+  <div class="stage" id="stage" tabindex="0" role="application" aria-label="Spielfeld. Zielen mit Maus, Finger oder Pfeiltasten. Halten mit Finger, Maustaste oder Leertaste, blind loslassen.">
+    <canvas id="cv"></canvas>
+  </div>
+  <p class="status" id="status" aria-live="polite"></p>
+
+  <section class="box" id="sackBox" aria-labelledby="h-sack">
+    <div class="box-top"><h2 id="h-sack">Dein Sack</h2><span id="count">0 von 24 gefangen</span></div>
+    <p class="score" id="score" aria-live="polite"></p>
+    <div class="chips" id="chips"></div>
+    <p class="note">Jedes gefangene Päckli lässt einen Stern in seiner Farbe im All zurück. Am 24. Dezember fängst du den Esel mit dem Sack ein, dann verbinden sich alle Sterne zu einem grossen Stern. Je knapper vor der Zeit du loslässt, desto mehr Punkte, höchstens 100 pro Päckli. Nach drei Fehlwürfen auf dasselbe Päckli bleibt die Uhr beim nächsten Wurf sichtbar. Tipp auf ein gefangenes Päckli, um seine Frage nochmals zu lesen.</p>
+    <div class="row">
+      <label class="switch"><input type="checkbox" id="real"> Echter Advent: Päckli erst an ihrem Tag</label>
+      <label class="switch"><input type="checkbox" id="sound" checked> Ton</label>
+    </div>
+    <div class="acts">
+      <button class="btn ghost" type="button" id="openSum">Dein Advent in Antworten</button>
+      <button class="btn ghost" type="button" id="replay">Unfall nochmals ansehen</button>
+      <button class="btn ghost" type="button" id="reset">Neu anfangen</button>
+    </div>
+  </section>
+
+  <div class="extra">
+  <section class="box main" id="giveBox" aria-labelledby="h-give">
+    <h2 id="h-give">Verschenken</h2>
+    <p class="sub" id="giveSub">Gib ein, für wen er ist. Du bekommst einen persönlichen Link, den du verschickst. Verschenken und Bekommen sind gratis.</p>
+    <form class="give" id="giveForm" novalidate>
+      <div class="row2">
+        <label class="fld"><span>Für</span><input id="fuer" type="text" maxlength="30" placeholder="Name" autocomplete="off" aria-describedby="fuerErr"></label>
+        <label class="fld"><span>Von</span><input id="von" type="text" maxlength="30" placeholder="Dein Name" autocomplete="off"></label>
+      </div>
+      <p class="err" id="fuerErr" hidden>Für wen ist das Geschenk? Gib einen Namen ein.</p>
+      <button class="btn" type="submit" id="makeBtn">Geschenk-Link erstellen</button>
+    </form>
+    <div class="done" id="done" hidden>
+      <p class="done-t" id="doneT"></p>
+      <div class="linkbox"><code id="giveLink"></code></div>
+      <div class="acts">
+        <button class="btn" type="button" id="copyLink">Link kopieren</button>
+        <button class="btn ghost" type="button" id="copyMsg">Nachricht kopieren</button>
+        <a class="btn ghost" id="wa" href="https://wa.me/" target="_blank" rel="noopener">Per WhatsApp</a>
+      </div>
+      <p class="sub small">Nur wer diesen Link hat, kann den Kalender öffnen. Wer ihn weiterschickt, verschenkt ihn weiter.</p>
+    </div>
+  </section>
+  <p class="got" id="gotLink">Du hast einen Link bekommen? Öffne genau diesen Link, dann geht dein Kalender auf.</p>
+  <section class="box" id="kollBox" aria-labelledby="h-koll">
+    <h2 id="h-koll">Kollekte</h2>
+    <p class="sub">Du musst nichts bezahlen, weder fürs Verschenken noch fürs Bekommen. Wenn dir die Fragerei etwas wert ist, freuen wir uns über einen freiwilligen Betrag.</p>
+    <div class="amounts" role="group" aria-label="Betrag">
+      <button type="button" class="amt" data-amt="5" aria-pressed="true">CHF 5</button>
+      <button type="button" class="amt" data-amt="12" aria-pressed="false">CHF 12</button>
+      <button type="button" class="amt" data-amt="24" aria-pressed="false">CHF 24</button>
+      <button type="button" class="amt" data-amt="own" aria-pressed="false">Anderer Betrag</button>
+    </div>
+    <label class="fld amt-own" id="ownAmt" hidden><span>Betrag in Franken</span><input id="amt" type="number" inputmode="numeric" min="1" max="1000" step="1" placeholder="z. B. 10"></label>
+    <a class="btn" id="kollekte" href="https://go.twint.ch/" target="_blank" rel="noopener">CHF 5 mit TWINT geben</a>
+  </section>
+  </div>
+</main>
+<footer class="wrap foot">
+  <span>fröge fröge fröge ✦ · Fragen vom KOH • CHI kollektiv · <a href="/" style="color:inherit">fragen.fragerei.ch</a></span>
+  <button class="linkish" type="button" id="forget" hidden>Geschenk auf diesem Gerät vergessen</button>
+</footer>
+
+<div class="modal" id="modal" hidden>
+  <div class="panel" role="dialog" aria-modal="true" aria-labelledby="pEye" tabindex="-1" id="panel">
+    <div class="p-head"><p class="eyebrow" id="pEye" style="margin:0"></p><button class="x" type="button" id="close" aria-label="Zurück ins All">×</button></div>
+    <div id="reveal" style="display:grid;gap:12px">
+      <div class="qcard"><p class="q" id="qText"></p><p class="f">Stell sie jemandem. Im Tram, am Znachttisch, zwischen Tür und Angel.</p></div>
+      <label class="alabel" for="ans">Deine Antwort, im Päckli gespeichert <small>(bleibt nur auf diesem Gerät)</small></label>
+      <textarea id="ans" rows="3" placeholder="Schreib auf, was dir dazu einfällt …"></textarea>
+      <div class="acts"><button class="btn" type="button" id="saveAns">Im Päckli speichern</button><button class="btn ghost" type="button" id="toSum" hidden>Dein Advent in Antworten</button><button class="btn ghost" type="button" id="back">Zurück ins All</button></div>
+    </div>
+    <div id="summary" hidden style="display:grid;gap:12px">
+      <p class="lead" id="sumInfo"></p>
+      <ol class="sum-list" id="sumList"></ol>
+      <div class="acts"><button class="btn" type="button" id="copyAns">Alle Antworten kopieren</button><button class="btn ghost" type="button" id="back2">Zurück ins All</button></div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+<button class="btn ghost skip" type="button" id="skip" hidden>Überspringen</button>
+
+<div class="preview" id="preview" hidden>
+  <div class="wrap">
+    <p>Vorschau fürs Kollektiv</p>
+    <div class="seg" role="group" aria-label="Ansicht">
+      <button type="button" data-view="gate" aria-pressed="false">Ohne Link</button>
+      <button type="button" data-view="game" aria-pressed="false">Mit Geschenk-Link</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(() => {
+'use strict';
+const $ = s => document.querySelector(s);
+const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+// the collective's 24 Advent questions (same list as the Fragewürfel)
+const FRAGEN = [
+  'Wie geniesst du die Kälte?',
+  'Was war dein längster Lachanfall-Moment? Wo & mit wem?',
+  'Wie streitest du?',
+  'Was war dein Lieblingsspielzeug?',
+  'Was war dein grösster Wunsch für ein Weihnachtsgeschenk in deiner Kindheit?',
+  'Wie sieht deine Wunschliste an den Samichlaus heute aus?',
+  'Was siehst du ALLES wenn du in den Spiegel schaust?',
+  'Was ist dein go-to Samichlaus/Schmutzli Sprüchli?',
+  'Was ist deine Winter-Superpower?',
+  'Wie feierst du dich?',
+  'Wie tanzt du zu X-Mas Songs?',
+  'Wie schenkst du? (Wie bist du wenn du beschenkt wirst?)',
+  'Was ist dein Nordstern?',
+  'Wenn dir de Samichlaus irgend ei Frag chönnti beantworte, was würsch umbedingt wele wüsse?',
+  'Welches Weihnachtslied sollte nie mehr gespielt werden dürfen?',
+  'Du schmückst den Weihnachtsbaum mit all deinen Fähigkeiten und Ressourcen: was hängt alles am Baum?',
+  'Wenn du ein neues Sprüchli erfinden müsstest: wie lautet es und wem würdest du es sagen? (Team Samichlaus oder Team Schmutzli?)',
+  'Welcher Wunsch darf im neuen Jahr wahr werden?',
+  'Was steht dieses Jahr über dich auf dem Zettel vom Weihnachtsmann?',
+  'In all den Jahren seit dich der Weihnachtsmann kennt - wie würde er dich in mind. 5 Sätzen einer fremden Person beschreiben?',
+  'Wie drückst du kulinarisch deine Liebe aus?',
+  'Was war dein im Nachhinein grösstes, aber unerwartetes Geschenk dieses Jahr?',
+  'Durch welches Türli willst du nächstes Jahr gehen, das du noch nie gegangen bist?',
+  'Wie strahlst du am hellsten? Wie bringst du deinen Stern zum Leuchten?',
+];
+
+/* ---------- rules, easy to tune ---------- */
+// Päckli 1–10: 1–10 s. Päckli 11–23: 1,1–2,3 s. Der Esel (24): 2,4 s.
+const SECS = n => n <= 10 ? n : n / 10;
+// the catch window: never later than the Päckli's time, and not too early.
+// 1 s from 0,5 · 2 s from 1,3 · 3 s from 2 · from 4 s on one second early (4 s from 3, 7 s from 6).
+const LO = n => { const T = SECS(n), m = T <= 1 ? .5 : T <= 2 ? .5 + .2 * (T - 1) : T <= 3 ? .7 + .3 * (T - 2) : 1; return Math.round((T - m) * 10) / 10; };
+const inWin = (n, h) => h >= LO(n) && h <= SECS(n);
+const HELP_AFTER = 3;     // after this many misses on one Päckli the clock stays visible
+const MAX_PTS = 100;      // per Päckli; a catch with the clock's help gives 10
+const BLIND_AFTER = .5;   // the clock shows only the first half second
+const MIN_HOLD = .2;      // shorter is a tap, not a throw
+
+const YEAR = 2026;
+const WDL = ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'];
+const long = d => `${WDL[new Date(YEAR, 11, d).getDay()]}, ${d}. Dezember`;
+const now0 = new Date(), today0 = new Date(now0.getFullYear(), now0.getMonth(), now0.getDate());
+const realDay = today0 < new Date(YEAR, 11, 1) ? 0 : today0 > new Date(YEAR, 11, 24) ? 24 : today0.getDate();
+
+const fmt = (x, d) => x.toFixed(d).replace('.', ',');
+const fmtS = x => String(Math.round(x * 10) / 10).replace('.', ',');
+const winLabel = n => `${fmtS(LO(n))}–${fmtS(SECS(n))} s`;
+const rn = T => .2 + .8 * Math.log1p(Math.max(0, T)) / Math.log1p(10);   // seconds → distance (1 = edge)
+const wrapA = a => { a = (a + Math.PI) % (2 * Math.PI); if (a < 0) a += 2 * Math.PI; return a - Math.PI; };
+const lerp = (a, b, k) => a + (b - a) * k;
+const easeOut = k => 1 - Math.pow(1 - k, 3);
+const easeIO = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+
+/* ---------- where things float ---------- */
+const COLS = ['#b9a7ff', '#7fe0c4', '#ffd36b', '#ff9e7a', '#ff9a9a'];
+// every Päckli has its own direction, evenly spaced around the Samichlaus, so aiming never wavers between two;
+// the order around the circle is mixed so that no two Päckli crowd each other (found once by a search, smallest gap 0,18)
+const SLOT = [2, 9, 21, 15, 0, 5, 17, 12, 19, 10, 8, 14, 4, 6, 11, 20, 22, 18, 1, 16, 13, 3, 7], A0 = -1.4342;
+const P = [];
+for (let n = 1; n <= 23; n++) P.push({ n, T: SECS(n), r: rn(SECS(n)), a: wrapA(A0 + SLOT[n - 1] * 2 * Math.PI / 23), col: COLS[n % 5] });
+const ESEL_R = rn(2.4);
+const DEC = [], cands = [];
+for (let gx = -1; gx <= 1.001; gx += .08) for (let gy = -1; gy <= 1.001; gy += .08) { const r = Math.hypot(gx, gy); if (r > .7 && r < 1.08 && Math.abs(r - ESEL_R) > .12) cands.push([gx, gy]); }
+const farFrom = (x, y) => Math.min(...P.map(p => Math.hypot(Math.cos(p.a) * p.r - x, Math.sin(p.a) * p.r - y)), ...DEC.map(d => Math.hypot(d.x - x, d.y - y) * .45));
+for (let k = 0; k < 4; k++) { let best = cands[0], bs = -1; for (const [x, y] of cands) { const s = farFrom(x, y); if (s > bs) { bs = s; best = [x, y]; } } DEC.push({ x: best[0], y: best[1], kind: k === 3 ? 'sat' : 'deer', ph: k * 1.7, spin: (k % 2 ? 1 : -1) * (.15 + k * .05) }); }
+const ORIG_DEER = i => [.36 + i * .27, -.05 - i * .03], ORIG_SAT = [.08, -.06], ORIG_ESEL = [-.32, .08];
+const JUNK = ['ein Mailänderli', 'eine Satellitenschraube', 'ein Rentierglöggli', 'eine Mandarine', 'ein Erdnüssli', 'ein Tannenzweig', 'ein bisschen Sternenstaub', 'Schmutzlis Handschuh', 'ein Grittibänz-Arm', 'eine Christbaumkugel'];
+
+/* ---------- saved progress (this device only) ---------- */
+const K1 = 'samichlaus-im-all-gefangen', K2 = 'samichlaus-im-all-antworten', K3 = 'samichlaus-im-all-intro', K4 = 'samichlaus-im-all-punkte', K5 = 'samichlaus-im-all-fehlwuerfe', K6 = 'samichlaus-im-all-bestwert';
+let caught = new Set(), answers = {}, seenIntro = false, scores = {}, misses = {}, best = 0;
+try { caught = new Set(JSON.parse(localStorage.getItem(K1) || '[]')); } catch (e) {}
+try { answers = JSON.parse(localStorage.getItem(K2) || '{}') || {}; } catch (e) {}
+try { seenIntro = localStorage.getItem(K3) === '1'; } catch (e) {}
+try { scores = JSON.parse(localStorage.getItem(K4) || '{}') || {}; misses = JSON.parse(localStorage.getItem(K5) || '{}') || {}; best = +localStorage.getItem(K6) || 0; } catch (e) {}
+const total = () => Object.values(scores).reduce((a, b) => a + (+b || 0), 0);
+const hasHelp = n => (misses[n] || 0) >= HELP_AFTER;
+const save = () => { try { localStorage.setItem(K1, JSON.stringify([...caught])); localStorage.setItem(K2, JSON.stringify(answers)); localStorage.setItem(K4, JSON.stringify(scores)); localStorage.setItem(K5, JSON.stringify(misses)); localStorage.setItem(K6, String(best)); } catch (e) {} };
+const isLocked = n => $('#real').checked && n > realDay;
+
+/* ---------- sound ---------- */
+let ac = null;
+function beep(f, d = .09, type = 'sine', vol = .05, delay = 0, f2) {
+  if (!$('#sound').checked) return;
+  try {
+    ac = ac || new (window.AudioContext || window.webkitAudioContext)();
+    const o = ac.createOscillator(), g = ac.createGain(), t = ac.currentTime + delay;
+    o.type = type; o.frequency.setValueAtTime(f, t); if (f2) o.frequency.exponentialRampToValueAtTime(f2, t + d);
+    o.connect(g); g.connect(ac.destination);
+    g.gain.setValueAtTime(vol, t); g.gain.exponentialRampToValueAtTime(.0001, t + d);
+    o.start(t); o.stop(t + d + .03);
+  } catch (e) {}
+}
+const jingle = () => [523, 659, 784, 1047].forEach((f, i) => beep(f, .16, 'triangle', .05, i * .09));
+const sad = () => [392, 330].forEach((f, i) => beep(f, .2, 'sine', .04, i * .14));
+const whoosh = () => beep(700, .35, 'sawtooth', .015, 0, 120);
+
+/* ---------- canvas ---------- */
+const stage = $('#stage'), cv = $('#cv'), ctx = cv.getContext('2d');
+// the canvas is as wide as the screen; the play field is the square in its middle (S × S), everything else is open sky
+let S = 300, C = 150, R = 130, dpr = 1, W = 300, H = 300, OX = 0, OY = 0, ready = false, inDraw = false, redo = false;
+// a new canvas size wipes the canvas, so it is drawn again at once (otherwise it flickers for a frame)
+function size() {
+  W = stage.clientWidth || 300; H = stage.clientHeight || W; S = Math.min(W, H);
+  if (stage.classList.contains('full') && W > H) S = Math.min(W, H * .82);   // full screen across: leave room below the field for the words
+  dpr = Math.min(2, window.devicePixelRatio || 1, Math.sqrt(4.6e6 / (W * H)));
+  cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); C = S / 2; R = S / 2 * .84; OX = (W - S) / 2; OY = (H - S) / 2;
+  if (ready) { if (inDraw) redo = true; else draw(performance.now()); }
+}
+size();
+if (window.ResizeObserver) new ResizeObserver(size).observe(stage); else addEventListener('resize', size);
+const X = u => C + u * R;
+const EX = () => W / 2 / R, EY = () => H / 2 / R;          // from the middle to the canvas edge, in play-field units
+// where texts stand: below the Päckli if there is room (on a phone, in full screen), else at the bottom of the field
+const TY = () => { const room = S + OY - S * .96; return room >= R * .32 ? S * .96 + Math.min(room / 2, R * .55) + R * .05 : S * .9; };
+
+/* ---------- the starry sky behind the whole page ---------- */
+const sky = $('#sky'), sx = sky.getContext('2d');
+const TINT = ['#fff3f5', '#fff3f5', '#fff3f5', '#d8d0ff', '#cfeee6', '#ffe9c2'];
+const STARS = Array.from({ length: 420 }, (_, i) => ({ x: Math.random(), y: Math.random(), r: Math.random() * 1.15 + .3, p: Math.random() * 6.3, c: TINT[i % TINT.length], big: Math.random() < .035 }));
+let SW = 0, SH = 0, sdpr = 1, shoot = null, nextShoot = 5, skyDirty = true;
+function sizeSky() { SW = sky.clientWidth || innerWidth; SH = sky.clientHeight || innerHeight; sdpr = Math.min(2, window.devicePixelRatio || 1); sky.width = Math.round(SW * sdpr); sky.height = Math.round(SH * sdpr); skyDirty = true; if (ready) drawBg(clock); }
+sizeSky(); addEventListener('resize', sizeSky);
+function drawBg(t) {
+  sx.setTransform(sdpr, 0, 0, sdpr, 0, 0); sx.clearRect(0, 0, SW, SH);
+  const n = Math.min(STARS.length, Math.max(140, Math.round(SW * SH / 3200)));
+  for (let i = 0; i < n; i++) {
+    const s = STARS[i], x = s.x * SW, y = s.y * SH;
+    sx.globalAlpha = reduce ? .6 : .28 + .5 * Math.sin(t * 1.1 + s.p) ** 2; sx.fillStyle = s.c;
+    sx.beginPath(); sx.arc(x, y, s.r, 0, 7); sx.fill();
+    if (s.big) { const r = s.r * 4.2; sx.beginPath(); sx.moveTo(x, y - r); sx.quadraticCurveTo(x, y, x + r, y); sx.quadraticCurveTo(x, y, x, y + r); sx.quadraticCurveTo(x, y, x - r, y); sx.quadraticCurveTo(x, y, x, y - r); sx.fill(); }
+  }
+  sx.globalAlpha = 1;
+  // now and then a shooting star
+  if (!reduce && !shoot && t > nextShoot) shoot = { t0: t, x: .15 + Math.random() * .7, y: Math.random() * .45, d: Math.random() < .5 ? -1 : 1 };
+  if (shoot) {
+    const k = (t - shoot.t0) / .9;
+    if (k >= 1) { shoot = null; nextShoot = t + 7 + Math.random() * 9; }
+    else {
+      const len = Math.min(SW, SH) * .24, x = shoot.x * SW + shoot.d * k * len * 1.6, y = shoot.y * SH + k * len * .8;
+      const g = sx.createLinearGradient(x, y, x - shoot.d * len * .5, y - len * .25);
+      g.addColorStop(0, `rgba(255,243,245,${.9 * Math.sin(k * Math.PI)})`); g.addColorStop(1, 'rgba(255,243,245,0)');
+      sx.strokeStyle = g; sx.lineWidth = 1.6; sx.lineCap = 'round'; sx.beginPath(); sx.moveTo(x, y); sx.lineTo(x - shoot.d * len * .5, y - len * .25); sx.stroke();
+    }
+  }
+}
+
+function ell(x, y, rx, ry, rot, col) { ctx.fillStyle = col; ctx.beginPath(); ctx.ellipse(x, y, Math.max(.1, rx), Math.max(.1, ry), rot || 0, 0, 7); ctx.fill(); }
+function rr(x, y, w, h, r) { ctx.beginPath(); ctx.moveTo(x + r, y); ctx.arcTo(x + w, y, x + w, y + h, r); ctx.arcTo(x + w, y + h, x, y + h, r); ctx.arcTo(x, y + h, x, y, r); ctx.arcTo(x, y, x + w, y, r); ctx.closePath(); }
+function star4(x, y, r, col) { ctx.fillStyle = col; ctx.beginPath(); ctx.moveTo(x, y - r); ctx.quadraticCurveTo(x, y, x + r, y); ctx.quadraticCurveTo(x, y, x, y + r); ctx.quadraticCurveTo(x, y, x - r, y); ctx.quadraticCurveTo(x, y, x, y - r); ctx.fill(); }
+function stroke(col, w, pts) { ctx.strokeStyle = col; ctx.lineWidth = w; ctx.lineCap = 'round'; ctx.beginPath(); for (const p of pts) { ctx.moveTo(p[0], p[1]); for (let i = 2; i < p.length; i += 2) ctx.lineTo(p[i], p[i + 1]); } ctx.stroke(); }
+
+function drawPkg(x, y, s, p, locked, t, spin = 0) {
+  ctx.save(); ctx.translate(x, y);
+  if (!locked) { const g = ctx.createRadialGradient(0, 0, 0, 0, 0, s * 2.6); g.addColorStop(0, `rgba(212,247,122,${.22 + .12 * Math.sin(t * 3 + p.n)})`); g.addColorStop(1, 'rgba(212,247,122,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(0, 0, s * 2.6, 0, 7); ctx.fill(); }
+  ctx.rotate((reduce ? 0 : Math.sin(t * .7 + p.n * 1.3) * .22) + spin);
+  ctx.globalAlpha = locked ? .42 : 1;
+  rr(-s, -s * .8, 2 * s, 1.8 * s, s * .28); ctx.fillStyle = p.col; ctx.fill();
+  ctx.fillStyle = 'rgba(29,10,51,.16)'; ctx.fillRect(-s, s * .35, 2 * s, s * .5);
+  const rib = locked ? '#e6e0f5' : '#fff3d1';
+  ctx.fillStyle = rib; ctx.fillRect(-s * .17, -s * .8, s * .34, s * 1.8); ctx.fillRect(-s, -s * .16, 2 * s, s * .32);
+  ell(-s * .34, -s * .98, s * .34, s * .2, .45, rib); ell(s * .34, -s * .98, s * .34, s * .2, -.45, rib); ell(0, -s * .88, s * .13, s * .13, 0, p.col);
+  ctx.restore();
+  ctx.globalAlpha = locked ? .5 : 1;
+  ctx.fillStyle = '#fff3f5'; ctx.font = `800 ${Math.max(10, s * 1.05)}px Archivo, sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  ctx.fillText(p.n, x, y + s * 1.35);
+  ctx.globalAlpha = 1;
+}
+
+function drawChlaus(x, y, s, t, charge, swing, netInHand) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(reduce ? 0 : Math.sin(t * .6) * .05);
+  // cracked sleigh
+  rr(-s * .95, s * .42, s * 1.7, s * .5, s * .18); ctx.fillStyle = '#5a2a8a'; ctx.fill();
+  stroke('rgba(13,4,32,.7)', s * .04, [[s * .2, s * .42, s * .1, s * .6, s * .22, s * .72, s * .12, s * .92]]);
+  ctx.strokeStyle = '#ffd36b'; ctx.lineWidth = s * .07; ctx.lineCap = 'round';
+  ctx.beginPath(); ctx.moveTo(-s, s * 1.06); ctx.lineTo(s * .7, s * 1.06); ctx.quadraticCurveTo(s * 1.1, s * 1.06, s * 1.02, s * .74);
+  ctx.moveTo(-s * .6, s * .92); ctx.lineTo(-s * .6, s * 1.06); ctx.moveTo(s * .4, s * .92); ctx.lineTo(s * .4, s * 1.06); ctx.stroke();
+  // robe
+  ctx.fillStyle = '#e2463f'; ctx.beginPath(); ctx.moveTo(-s * .62, s * .62); ctx.lineTo(-s * .44, -s * .08); ctx.quadraticCurveTo(0, -s * .3, s * .44, -s * .08); ctx.lineTo(s * .62, s * .62); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#ffd36b'; ctx.fillRect(-s * .05, -s * .15, s * .1, s * .7);
+  rr(-s * .64, s * .5, s * 1.28, s * .16, s * .08); ctx.fillStyle = '#fff3f5'; ctx.fill();
+  // arms
+  const hx = s * .78, hy = -s * .55;
+  stroke('#e2463f', s * .2, [[s * .3, -s * .02, hx, hy], [-s * .3, -s * .02, -s * .5, s * .35]]);
+  ell(hx, hy, s * .12, s * .12, 0, '#fff3f5'); ell(-s * .52, s * .38, s * .1, s * .1, 0, '#fff3f5');
+  // face and beard
+  ell(0, -s * .42, s * .23, s * .24, 0, '#f6c9a8');
+  ctx.fillStyle = '#fff3f5'; ctx.beginPath(); ctx.moveTo(-s * .26, -s * .4); ctx.quadraticCurveTo(-s * .3, s * .12, 0, s * .2); ctx.quadraticCurveTo(s * .3, s * .12, s * .26, -s * .4); ctx.quadraticCurveTo(0, -s * .24, -s * .26, -s * .4); ctx.fill();
+  ell(-s * .09, -s * .33, s * .1, s * .05, .3, '#fff3f5'); ell(s * .09, -s * .33, s * .1, s * .05, -.3, '#fff3f5');
+  ell(0, -s * .38, s * .05, s * .045, 0, '#f0a58a');
+  ell(-s * .08, -s * .48, s * .028, s * .034, 0, '#1d0a33'); ell(s * .08, -s * .48, s * .028, s * .034, 0, '#1d0a33');
+  // mitre
+  ctx.fillStyle = '#e2463f'; ctx.beginPath(); ctx.moveTo(-s * .25, -s * .6); ctx.quadraticCurveTo(-s * .32, -s * .98, 0, -s * 1.24); ctx.quadraticCurveTo(s * .32, -s * .98, s * .25, -s * .6); ctx.closePath(); ctx.fill();
+  ctx.fillStyle = '#ffd36b'; ctx.fillRect(-s * .26, -s * .69, s * .52, s * .1); ctx.fillRect(-s * .035, -s * 1.14, s * .07, s * .5);
+  // the net
+  if (charge > 0) {
+    const lx = hx + Math.cos(swing) * s * .5, ly = hy - s * .4 + Math.sin(swing) * s * .14;
+    ell(lx, ly, s * .5, s * .24, 0, `rgba(212,247,122,${.28 * Math.min(1, charge / .8)})`);
+    stroke('rgba(255,243,245,.9)', Math.max(1, s * .035), [[hx, hy, lx, ly]]);
+    ctx.strokeStyle = 'rgba(255,243,245,.9)'; ctx.beginPath(); ctx.ellipse(lx, ly, s * .34, s * .13, Math.sin(swing) * .25, 0, 7); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(lx - s * .34, ly); ctx.lineTo(lx + s * .34, ly); ctx.moveTo(lx, ly - s * .13); ctx.lineTo(lx, ly + s * .13); ctx.stroke();
+  } else if (netInHand) {
+    ctx.strokeStyle = 'rgba(255,243,245,.85)'; ctx.lineWidth = Math.max(1, s * .03);
+    ctx.beginPath(); ctx.arc(hx + s * .12, hy - s * .18, s * .15, 0, 7); ctx.moveTo(hx - s * .03, hy - s * .18); ctx.lineTo(hx + s * .27, hy - s * .18); ctx.moveTo(hx + s * .12, hy - s * .33); ctx.lineTo(hx + s * .12, hy - s * .03); ctx.stroke();
+  }
+  ctx.restore();
+}
+const handPx = () => { const s = R * .15; return [X(0) + s * .78, X(0) - s * .55]; };
+
+function drawDeer(x, y, s, rot, t, dizzy) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  stroke('#6e4a30', s * .14, [[-s * .45, s * .25, -s * .7, s * .72], [-s * .2, s * .25, -s * .32, s * .72], [s * .3, s * .25, s * .52, s * .72], [s * .5, s * .25, s * .84, s * .66]]);
+  ell(0, 0, s * .72, s * .4, 0, '#a87348'); ell(s * .05, s * .14, s * .42, s * .17, 0, '#d9b38c');
+  ell(-s * .74, -s * .12, s * .1, s * .08, 0, '#fff3f5');
+  stroke('#a87348', s * .26, [[s * .45, -s * .1, s * .72, -s * .42]]);
+  ell(s * .82, -s * .48, s * .26, s * .19, .35, '#a87348'); ell(s * 1.04, -s * .38, s * .12, s * .1, 0, '#d9b38c');
+  ell(s * .66, -s * .6, s * .1, s * .05, -.6, '#8a5a36');
+  ell(s * .86, -s * .55, s * .035, s * .035, 0, '#1d0a33');
+  stroke('#ecd7b0', s * .07, [[s * .74, -s * .64, s * .62, -s * 1.02], [s * .66, -s * .88, s * .48, -s * .96], [s * .64, -s * .95, s * .74, -s * 1.12], [s * .88, -s * .66, s * .96, -s * 1.04], [s * .93, -s * .9, s * 1.1, -s * .98]]);
+  if (dizzy) for (let i = 0; i < 3; i++) { const a = t * 2.2 + i * 2.09; star4(s * .8 + Math.cos(a) * s * .38, -s * 1.3 + Math.sin(a) * s * .12, s * .12, '#ffd36b'); }
+  ctx.restore();
+}
+
+function drawEsel(x, y, s, rot, sack) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  stroke('#6f6c85', s * .14, [[-s * .45, s * .25, -s * .55, s * .74], [-s * .22, s * .25, -s * .2, s * .74], [s * .3, s * .25, s * .36, s * .74], [s * .5, s * .25, s * .66, s * .7]]);
+  stroke('#6f6c85', s * .06, [[-s * .7, -s * .05, -s * .95, s * .25]]); ell(-s * .97, s * .3, s * .07, s * .11, .3, '#4b4766');
+  ell(0, 0, s * .75, s * .42, 0, '#9a97ad'); ell(0, s * .15, s * .45, s * .17, 0, '#cfcbe0');
+  stroke('#9a97ad', s * .28, [[s * .45, -s * .12, s * .7, -s * .45]]);
+  ell(s * .66, -s * .88, s * .08, s * .3, -.35, '#9a97ad'); ell(s * .66, -s * .88, s * .04, s * .2, -.35, '#ff9a9a');
+  ell(s * .86, -s * .92, s * .08, s * .3, .15, '#9a97ad'); ell(s * .86, -s * .92, s * .04, s * .2, .15, '#ff9a9a');
+  ell(s * .86, -s * .42, s * .34, s * .2, .55, '#9a97ad'); ell(s * 1.08, -s * .22, s * .17, s * .14, .5, '#cfcbe0');
+  ell(s * .84, -s * .52, s * .035, s * .04, 0, '#1d0a33');
+  stroke('#4b4766', s * .06, [[s * .5, -s * .3, s * .58, -s * .46], [s * .6, -s * .36, s * .68, -s * .54], [s * .7, -s * .44, s * .76, -s * .62]]);
+  if (sack) {
+    stroke('#ffd36b', s * .05, [[s * 1.12, -s * .16, s * 1.42, -s * .02]]);
+    ctx.fillStyle = '#b98a4e'; ctx.beginPath(); ctx.moveTo(s * 1.32, -s * .05); ctx.quadraticCurveTo(s * .98, s * .5, s * 1.25, s * .82); ctx.quadraticCurveTo(s * 1.5, s * .98, s * 1.78, s * .8); ctx.quadraticCurveTo(s * 2.02, s * .45, s * 1.56, -s * .05); ctx.closePath(); ctx.fill();
+    ell(s * 1.44, -s * .04, s * .16, s * .06, 0, '#ffd36b');
+    stroke('rgba(29,10,51,.55)', s * .04, [[s * 1.55, s * .35, s * 1.65, s * .5, s * 1.56, s * .62]]);
+  }
+  ctx.restore();
+}
+
+function panel(px, py, w, h) { ctx.fillStyle = '#4b5bd8'; ctx.fillRect(px, py, w, h); ctx.strokeStyle = 'rgba(255,255,255,.35)'; ctx.lineWidth = 1; ctx.beginPath(); for (let i = 1; i < 4; i++) { ctx.moveTo(px + w * i / 4, py); ctx.lineTo(px + w * i / 4, py + h); } ctx.moveTo(px, py + h / 2); ctx.lineTo(px + w, py + h / 2); ctx.stroke(); }
+function drawSat(x, y, s, rot, t, broken) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  stroke('#c9cbe0', s * .06, [[-s * 1.2, 0, broken ? s * .42 : s * .6, 0]]);
+  panel(-s * 1.75, -s * .38, s * 1.05, s * .76);
+  if (broken) stroke('#c9cbe0', s * .05, [[s * .42, 0, s * .52, -s * .08, s * .58, s * .04]]);
+  else { ctx.save(); ctx.translate(s * .55, 0); ctx.rotate(.55); panel(0, -s * .38, s * 1.05, s * .76); ctx.restore(); }
+  rr(-s * .42, -s * .48, s * .84, s * .96, s * .1); ctx.fillStyle = '#ffd36b'; ctx.fill();
+  stroke('rgba(29,10,51,.3)', 1, [[-s * .42, -s * .1, s * .42, -s * .1], [-s * .42, s * .22, s * .42, s * .22]]);
+  if (broken) stroke('rgba(29,10,51,.55)', Math.max(1, s * .04), [[s * .1, -s * .48, s * .02, -s * .2, s * .16, s * .02]]);
+  stroke('#c9cbe0', s * .05, [[0, -s * .48, 0, -s * .7]]); ell(0, -s * .74, s * .32, s * .1, 0, '#e6e9f6');
+  if (reduce || Math.sin(t * 4.2) > .2) ell(0, -s * .86, s * .07, s * .07, 0, broken ? '#ff9e7a' : '#d4f77a');
+  ctx.restore();
+  for (let i = 0; i < 4; i++) { const a = t * .3 + i * 1.6; ctx.fillStyle = 'rgba(201,203,224,.75)'; ctx.fillRect(x + Math.cos(a) * s * 2.1, y + Math.sin(a * 1.3) * s * 1.4, s * .16, s * .1); }
+}
+
+function drawNet(x, y, r) {
+  ctx.save(); ctx.translate(x, y); ctx.strokeStyle = '#fff3f5'; ctx.lineWidth = 1.3;
+  ctx.beginPath(); ctx.arc(0, 0, r, 0, 7); ctx.moveTo(r * .55, 0); ctx.arc(0, 0, r * .55, 0, 7);
+  for (let i = 0; i < 8; i++) { const q = i * Math.PI / 4; ctx.moveTo(0, 0); ctx.lineTo(Math.cos(q) * r, Math.sin(q) * r); }
+  ctx.stroke();
+  for (let i = 0; i < 8; i++) { const q = i * Math.PI / 4; ell(Math.cos(q) * r, Math.sin(q) * r, 2, 2, 0, '#ffd36b'); }
+  ctx.restore();
+}
+
+/* ---------- game state ---------- */
+let view = 'gate', gift = null, preview = false, pvView = 'gate';
+const SAMPLE = { code: '', f: 'Mira', v: 'Noah', opened: false };
+const who = () => gift || (preview ? SAMPLE : null);
+let state = 'teaser', aim = -Math.PI / 2, t0 = 0, held = 0, fly = null, intro = null, finale = null, clock = 0, swing = 0, swingV = 6, pointerIn = false, pid = null, hv = null;
+const eselA = () => 2.3 + clock * .09;
+const eselPos = () => caught.has(24) ? [-.36, .2] : [Math.cos(eselA()) * ESEL_R, Math.sin(eselA()) * ESEL_R];
+const inNet = n => fly && fly.item && fly.item.n === n;
+
+// aim by direction only; the Päckli you already aim at stays the target a little longer, so it doesn't flicker at the border
+const AIM_W = .165, AIM_W_ESEL = .2, STICK = .04;   // radians
+function pick(angle, prev) {
+  const res = [];
+  for (const p of P) if (!caught.has(p.n)) { const d = Math.abs(wrapA(angle - p.a)); if (d < AIM_W) res.push({ n: p.n, T: p.T, d, locked: isLocked(p.n) }); }
+  if (!caught.has(24)) { const d = Math.abs(wrapA(angle - eselA())); if (d < AIM_W_ESEL) res.push({ n: 24, T: SECS(24), d, locked: isLocked(24) }); }
+  if (!res.length) return null;
+  const open = res.filter(c => !c.locked), pool = open.length ? open : res;
+  const key = c => c.d - (prev && prev.n === c.n ? STICK : 0);
+  return pool.sort((a, b) => key(a) - key(b))[0];
+}
+
+const statusEl = $('#status'), clockEl = $('#clock'), targetEl = $('#target');
+function say(t, kind) { statusEl.textContent = t; statusEl.className = 'status' + (kind ? ' ' + kind : ''); }
+let lastTarget = '';
+function showTarget(c) {
+  let t;
+  if (!c) t = 'In dieser Richtung schwebt nichts';
+  else if (c.n === 24) t = c.locked ? 'Der Esel mit dem Sack · ab 24. Dezember' : `Der Esel mit dem Sack · ${winLabel(24)}`;
+  else t = c.locked ? `Päckli ${c.n} · schläft bis ${c.n}. Dezember` : `Päckli ${c.n} · ${winLabel(c.n)}`;
+  if (c && !c.locked && hasHelp(c.n)) t += ' · die Uhr hilft';
+  if (t !== lastTarget) { lastTarget = t; targetEl.innerHTML = '<small>Ziel</small>'; targetEl.append(t); }
+}
+
+function startCharge() {
+  if (state === 'intro') { endIntro(); return; }
+  if (state !== 'idle') return;
+  state = 'charge'; t0 = performance.now(); swing = 0; swingV = 5 + Math.random() * 2;
+  say('');
+}
+function release() {
+  if (state !== 'charge') return;
+  held = (performance.now() - t0) / 1000;
+  if (held < MIN_HOLD) { state = 'idle'; clockEl.className = 'clock'; clockEl.textContent = '0,00 s'; say('Halten, nicht nur tippen. Lass los, wenn du denkst, die Zeit ist um.'); return; }
+  clockEl.className = 'clock'; clockEl.textContent = fmt(held, 2) + ' s';
+  const c = hv = pick(aim, hv), good = !!(c && !c.locked && inWin(c.n, held)), dur = .45 + .05 * Math.min(held, 10);
+  let a = aim, ru = rn(Math.min(held, 13));
+  if (good) { if (c.n === 24) { a = eselA() + .09 * dur; ru = ESEL_R; } else { a = P[c.n - 1].a; ru = P[c.n - 1].r; } }
+  state = 'fly'; fly = { a, ru, u: 0, dur, item: null, c, good, help: !!(c && hasHelp(c.n)) };
+  whoosh();
+}
+function resolve() {
+  const c = fly.c;
+  let good = false, text;
+  if (c && !c.locked) {
+    const T = c.T, lo = LO(c.n), name = c.n === 24 ? 'Der Esel mit dem Sack' : `Päckli ${c.n}`;
+    if (fly.good) {
+      good = true; fly.item = { n: c.n }; if (c.n !== 24) born[c.n] = clock;
+      const pts = fly.help ? 10 : Math.round(20 + (MAX_PTS - 20) * (1 - (T - held) / (T - lo)));
+      scores[c.n] = pts; delete misses[c.n];
+      text = fly.help ? `Gefangen, die Uhr hat geholfen: ${name}, +${pts} Punkte.`
+        : `${T - held <= .05 ? 'Volltreffer!' : 'Gefangen!'} ${name} mit ${fmt(held, 2)} Sekunden: +${pts} Punkte.`;
+    } else {
+      fly.item = { junk: true }; misses[c.n] = (misses[c.n] || 0) + 1; save();
+      const left = HELP_AFTER - misses[c.n], who = c.n === 24 ? 'Den Esel' : `Päckli ${c.n}`;
+      text = `${held > T ? `Zu spät: ${fmt(held, 2)} s, ${fmt(held - T, 2)} s zu lang.` : `Zu früh: ${fmt(held, 2)} s.`} ${who} fängst du zwischen ${fmtS(lo)} und ${fmtS(T)} Sekunden.`
+        + (left > 1 ? ` Noch ${left} Fehlwürfe, dann hilft dir die Uhr.` : left === 1 ? ' Noch ein Fehlwurf, dann hilft dir die Uhr.' : left === 0 ? ' Beim nächsten Wurf bleibt die Uhr sichtbar.' : ' Die Uhr bleibt sichtbar.');
+    }
+  } else if (c) {
+    text = c.n === 24 ? 'Der Esel hält den leeren Sack fest. Ihn fängst du erst am 24. Dezember ein.' : `Päckli ${c.n} schläft noch. Du kannst es ab ${long(c.n)} einfangen.`;
+  } else {
+    fly.item = { junk: true }; text = `In dieser Richtung schwebt kein Päckli. Im Netz: ${JUNK[Math.floor(Math.random() * JUNK.length)]}. (${fmt(held, 2)} s)`;
+  }
+  say(text, good ? 'good' : 'bad'); good ? jingle() : sad();
+  state = 'back'; fly.u = 0; fly.dur = .7;
+}
+function landed() {
+  const it = fly.item; fly = null; state = 'idle';
+  if (it && it.n) { caught.add(it.n); best = Math.max(best, total()); save(); renderChips(); if (it.n === 24) { state = 'finale'; finale = { t0: clock }; } else openPkg(it.n); }
+}
+
+// the gift opening fills the screen: first Fragerei, then the flight and the crash; then the page appears
+function enterFull() { stage.classList.add('full'); stage.classList.remove('settle'); document.body.classList.add('introing'); $('#skip').hidden = false; size(); }
+function exitFull() {
+  if (!stage.classList.contains('full')) return;
+  stage.classList.remove('full'); document.body.classList.remove('introing'); $('#skip').hidden = true; size();
+  void stage.offsetWidth; stage.classList.add('settle'); setTimeout(() => stage.classList.remove('settle'), 800);
+}
+function startIntro(title) { if (reduce) { endIntro(); return; } enterFull(); state = 'intro'; intro = { t0: clock, title: !!title, boom: false, pops: 0 }; fly = null; }
+function endIntro() { exitFull(); state = 'idle'; intro = null; seenIntro = true; try { localStorage.setItem(K3, '1'); } catch (e) {} if (gift && !gift.opened) { gift.opened = true; saveGift(gift); } say(caught.size ? '' : 'Such dir ein leuchtendes Päckli aus. Halte in seine Richtung und lass blind los.'); }
+
+/* ---------- stars left behind by caught Päckli ---------- */
+const born = {};   // when each star appeared, for its sparkle
+const hexA = (h, a) => `rgba(${parseInt(h.slice(1, 3), 16)},${parseInt(h.slice(3, 5), 16)},${parseInt(h.slice(5, 7), 16)},${a})`;
+const easeBack = k => 1 + 2.7 * Math.pow(k - 1, 3) + 1.7 * Math.pow(k - 1, 2);
+function drawMiniStar(x, y, s, p, t) {
+  const age = born[p.n] == null ? 9 : Math.max(0, t - born[p.n]);
+  const g = age < .6 ? Math.max(0, easeBack(age / .6)) : 1, tw = reduce ? 1 : 1 + .14 * Math.sin(t * 2.4 + p.n * 1.7);
+  const gl = ctx.createRadialGradient(x, y, 0, x, y, s * 3.4 * g + .1); gl.addColorStop(0, hexA(p.col, .45)); gl.addColorStop(1, hexA(p.col, 0));
+  ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(x, y, s * 3.4 * g + .1, 0, 7); ctx.fill();
+  star4(x, y, s * 1.5 * g * tw, p.col); star4(x, y, s * .7 * g * tw, '#fff9ea');
+  if (age < .9) { ctx.strokeStyle = hexA(p.col, 1 - age / .9); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(x, y, s * (1 + 5 * age / .9), 0, 7); ctx.stroke(); }
+}
+// on the 24th every star sends a line into the middle, where the big star lights up; it stays there afterwards
+function drawConstellation(k, t, live) {
+  const stars = P.filter(p => caught.has(p.n)), n = Math.max(1, stars.length), big = R * (.3 + .32 * stars.length / 23);
+  stars.forEach((p, i) => {
+    const l = Math.max(0, Math.min(1, (k - i / n * .35) / .3));
+    if (!l) return;
+    const sx = X(Math.cos(p.a) * p.r), sy = X(Math.sin(p.a) * p.r);
+    stroke(`rgba(255,211,107,${live ? .6 : .22})`, live ? 1.6 : 1, [[sx, sy, lerp(sx, C, l), lerp(sy, C, l)]]);
+  });
+  const g = Math.max(0, Math.min(1, (k - .45) / .45));
+  if (!g) return;
+  const pulse = reduce ? 1 : 1 + .05 * Math.sin(t * (live ? 6 : 1.5)), rr2 = big * 1.4 * g;
+  const gl = ctx.createRadialGradient(C, C, 0, C, C, rr2); gl.addColorStop(0, `rgba(255,243,209,${live ? .5 : .28})`); gl.addColorStop(1, 'rgba(255,243,209,0)');
+  ctx.fillStyle = gl; ctx.beginPath(); ctx.arc(C, C, rr2, 0, 7); ctx.fill();
+  star4(C, C, big * easeOut(g) * pulse, `rgba(255,243,209,${live ? .95 : .6})`);
+  star4(C, C, big * .5 * easeOut(g) * pulse, `rgba(255,211,107,${live ? .9 : .55})`);
+}
+
+/* ---------- the gift opening: Fragerei, then the Samichlaus flies in ---------- */
+const TITLE_T = 2.8, FLY_T = 3.8, CRASH_T = 6.8;
+const IMP = ORIG_SAT;                                   // where the satellite hits the sleigh
+const POP0 = .6, POP_GAP = .12, POP_T = 1.5;            // the Päckli leave the burst sack one after the other
+const popK = (n, ic) => easeOut(Math.max(0, Math.min(1, (ic - POP0 - (n - 1) * POP_GAP) / POP_T)));
+// sparks and splinters of the crash, fixed once so that every frame can place them
+const SPARKS = Array.from({ length: 34 }, (_, i) => ({ a: i / 34 * 6.283 + Math.random() * .25, v: .3 + Math.random() * .8, l: .6 + Math.random() * 1.1, c: ['#fff3d1', '#ffd36b', '#ff9e7a', '#d4f77a'][i % 4] }));
+// what breaks off the satellite: on a wide screen these pieces keep floating at the sides
+const DEBRIS = [
+  { kind: 'panel', a: -.2, d: 1.8, spin: .8 }, { kind: 'bolt', a: .4, d: 1.45, spin: -1.6 }, { kind: 'chip', a: -.62, d: 1.35, spin: 2 },
+  { kind: 'bolt', a: 2.85, d: 1.65, spin: 1.3 }, { kind: 'chip', a: 3.45, d: 1.95, spin: -1.1 }, { kind: 'dish', a: -2.7, d: 1.55, spin: .6 },
+  { kind: 'chip', a: 2.4, d: 2.35, spin: -.8 }, { kind: 'bolt', a: .12, d: 2.45, spin: 1.8 }, { kind: 'panel', a: 3.05, d: 2.6, spin: -.5 },
+];
+function drawBit(x, y, s, d, rot) {
+  ctx.save(); ctx.translate(x, y); ctx.rotate(rot);
+  if (d.kind === 'panel') { panel(-s * .52, -s * .38, s * 1.05, s * .76); stroke('#c9cbe0', s * .05, [[-s * .52, 0, -s * .72, -s * .06]]); }
+  else if (d.kind === 'bolt') { rr(-s * .17, -s * .1, s * .34, s * .2, s * .05); ctx.fillStyle = '#c9cbe0'; ctx.fill(); stroke('#8a8fb5', Math.max(1, s * .04), [[-s * .05, -s * .1, -s * .05, s * .1]]); }
+  else if (d.kind === 'chip') { ctx.fillStyle = '#ffd36b'; ctx.beginPath(); ctx.moveTo(-s * .2, -s * .14); ctx.lineTo(s * .22, -s * .05); ctx.lineTo(-s * .04, s * .18); ctx.closePath(); ctx.fill(); }
+  else { stroke('#c9cbe0', s * .05, [[0, 0, 0, s * .22]]); ell(0, 0, s * .32, s * .1, 0, '#e6e9f6'); }
+  ctx.restore();
+}
+const HOLO = [[0, '#d8fff4'], [.22, '#8ff0dc'], [.44, '#b6d4ff'], [.64, '#cdb8ff'], [.84, '#ffc9ec'], [1, '#fff3d1']];
+if (document.fonts && document.fonts.load) document.fonts.load('700 40px "Space Grotesk"').catch(() => {});
+function drawTitle(it) {
+  const a = Math.min(1, it / .8) * Math.max(0, Math.min(1, (TITLE_T - it) / .7)), sc = .94 + .1 * it / TITLE_T;
+  const g = who(), fs = Math.round(R * .3);
+  ctx.save(); ctx.globalAlpha = a; ctx.translate(C, C); ctx.scale(sc, sc);
+  ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+  ctx.font = `700 ${fs}px "Space Grotesk", Manrope, sans-serif`;
+  const w = ctx.measureText('Fragerei').width, gr = ctx.createLinearGradient(-w / 2, -fs * .5, w / 2, fs * .5);
+  for (const [o, c] of HOLO) gr.addColorStop(o, c);
+  ctx.shadowColor = 'rgba(185,167,255,.6)'; ctx.shadowBlur = R * .09;
+  ctx.fillStyle = gr; ctx.fillText('Fragerei', 0, 0);
+  ctx.shadowBlur = 0;
+  ctx.fillStyle = '#d4f77a'; ctx.font = `800 ${Math.round(R * .06)}px Archivo, sans-serif`;
+  ctx.fillText('A D V E N T S Z E I T', 0, -fs * .78);
+  if (g) {
+    ctx.fillStyle = 'rgba(255,243,245,.85)'; ctx.font = `700 ${Math.round(R * .075)}px Manrope, sans-serif`;
+    ctx.fillText(`für ${g.f}${g.v ? ' · von ' + g.v : ''}`, 0, fs * .8);
+  }
+  ctx.restore();
+}
+// the sleigh with the reindeer in front and the Esel behind, as it flies
+function drawTeam(gx, gy, t, cs) {
+  for (let i = 0; i < 3; i++) { const o = ORIG_DEER(i); drawDeer(X(gx + o[0]), X(gy + o[1]), R * .075, -.05, t, false); }
+  stroke('rgba(255,211,107,.8)', 1.2, [[X(gx) + cs * .78, X(gy) - cs * .55, X(gx + .36), X(gy - .05)]]);
+  drawEsel(X(gx + ORIG_ESEL[0]), X(gy + ORIG_ESEL[1]), R * .07, 0, true);
+  drawChlaus(X(gx), X(gy), cs, t, 0, 0, true);
+}
+// before the gift is opened: the Samichlaus flies by again and again, the satellite drifts
+function drawTeaser(t, cs) {
+  const ph = (t % 10) / 10, L = EX(), gx = lerp(-L - 1.2, L + .7, ph), gy = .1 + Math.sin(ph * Math.PI * 2) * .2;
+  drawSat(X(.6 + Math.sin(t * .2) * .05), X(-.6 + Math.cos(t * .25) * .04), R * .075, t * .3, t);
+  drawTeam(gx, gy, t, cs);
+}
+
+// the team races in from the left, slows down as if in slow motion; the satellite drops in from above
+function drawApproach(p, t, cs) {
+  const L = EX(), k = 1 - Math.pow(1 - p, 2.6), sk = 1 - Math.pow(1 - p, 1.9);
+  const path = q => [lerp(-L - 1.2, 0, q), lerp(-.5, 0, q) - Math.sin(q * Math.PI) * .22];
+  for (let i = 1; i <= 16; i++) {   // star dust behind the sleigh
+    const q = Math.max(0, k - i * .02), [dx, dy] = path(q);
+    ctx.globalAlpha = (1 - i / 17) * .75; star4(X(dx - .28), X(dy + .14 + Math.sin(i * 1.7 + t * 3) * .012), R * .011 * (1 + i % 3), i % 2 ? '#ffd36b' : '#fff3d1');
+  }
+  ctx.globalAlpha = 1;
+  const [gx, gy] = path(k);
+  drawSat(X(lerp(1.25, IMP[0], sk)), X(lerp(-EY() - .4, IMP[1], sk)), R * .075, .6 - sk * 1.4 + Math.sin(t * .8) * .1, t, false);
+  drawTeam(gx, gy, t, cs);
+  if (p > .66) {   // the Samichlaus sees it coming
+    const a = Math.min(1, (p - .66) / .07), bx = X(gx) + cs * .15, by = X(gy) - cs * 1.75, z = cs * .26 * easeBack(a);
+    ctx.globalAlpha = a; rr(bx - z, by - z * 1.2, z * 2, z * 2.4, z * .6); ctx.fillStyle = '#fff3f5'; ctx.fill();
+    ctx.beginPath(); ctx.moveTo(bx - z * .3, by + z * 1.15); ctx.lineTo(bx - z * .55, by + z * 1.7); ctx.lineTo(bx + z * .3, by + z * 1.15); ctx.fill();
+    ctx.fillStyle = '#e2463f'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.font = `800 ${Math.round(z * 1.9)}px Archivo, sans-serif`; ctx.fillText('!', bx, by + z * .05);
+    ctx.globalAlpha = 1;
+  }
+}
+// the crash: flash and shaking, sparks, the satellite breaks, the reins snap, the sack bursts and the Päckli tumble out one after the other
+function drawCrash(ic, t, cs) {
+  if (!intro.boom) { intro.boom = true; beep(150, .55, 'sawtooth', .05, 0, 35); beep(90, .8, 'square', .03, .03, 28); }
+  while (intro.pops < 23 && ic >= POP0 + intro.pops * POP_GAP) { intro.pops++; beep(520 + intro.pops * 28, .06, 'triangle', .025); }
+  const sh = !reduce && ic < 1.2 ? Math.pow(1 - ic / 1.2, 2) * R * .055 : 0;
+  ctx.save(); if (sh) ctx.translate(Math.sin(ic * 71) * sh, Math.cos(ic * 53) * sh);
+  const e = easeOut(Math.max(0, Math.min(1, (ic - .15) / 4.8)));
+  scene(e, t, n => popK(n, ic));
+  // the snapped reins dangle from his hand
+  if (ic < 3.2) { const hx = X(0) + cs * .78, hy = X(0) - cs * .55, w = Math.sin(t * 5) * R * .03; ctx.strokeStyle = `rgba(255,211,107,${.8 * (1 - ic / 3.2)})`; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.quadraticCurveTo(hx + R * .1, hy + R * .02 + w, hx + R * .16, hy + R * .1 - w); ctx.stroke(); }
+  // the Samichlaus tumbles and comes to rest, with stars circling his head
+  const wob = Math.sin(ic * 2.6) * .4 * Math.exp(-ic * .55);
+  ctx.save(); ctx.translate(X(0), X(0)); ctx.rotate(wob); ctx.translate(-X(0), -X(0)); drawChlaus(X(0), X(0), cs, t, 0, 0, true); ctx.restore();
+  if (ic > .7) { ctx.globalAlpha = Math.min(1, (ic - .7) / .5) * Math.min(1, (CRASH_T - ic) / 1); for (let i = 0; i < 3; i++) { const a = t * 2.4 + i * 2.09; star4(X(0) + Math.cos(a) * cs * .42, X(0) - cs * 1.42 + Math.sin(a) * cs * .13, cs * .1, '#ffd36b'); } ctx.globalAlpha = 1; }
+  // sparks fly from the point of impact
+  const ix = X(IMP[0]), iy = X(IMP[1]);
+  for (const sp of SPARKS) {
+    const a = 1 - ic / sp.l; if (a <= 0) continue;
+    const d = sp.v * (1 - Math.exp(-ic * 2.4)) * R * .7, dx = Math.cos(sp.a), dy = Math.sin(sp.a), tail = R * .05 * a;
+    stroke(hexA(sp.c, a), Math.max(1.2, R * .007), [[ix + dx * d, iy + dy * d, ix + dx * (d - tail), iy + dy * (d - tail)]]);
+  }
+  // two shock waves
+  for (const [d0, m] of [[0, 1], [.14, .7]]) { const q = (ic - d0) / .9; if (q > 0 && q < 1) { ctx.strokeStyle = `rgba(255,243,209,${.7 * m * (1 - q)})`; ctx.lineWidth = R * .02 * (1 - q) + 1; ctx.beginPath(); ctx.arc(ix, iy, R * (.06 + 1.5 * easeOut(q)), 0, 7); ctx.stroke(); } }
+  if (ic < .55) star4(ix, iy, R * (.12 + .5 * easeOut(ic / .55)) * (1 - ic / .55), 'rgba(255,250,230,.95)');
+  ctx.restore();
+  // the flash covers everything for a moment
+  if (ic < .45) { ctx.fillStyle = `rgba(255,250,230,${.9 * (1 - ic / .45)})`; ctx.fillRect(-OX - 40, -OY - 40, W + 80, H + 80); }
+  // what happened, in words
+  const ty = TY();
+  if (ic > 1.1) {
+    const a1 = Math.min(1, (ic - 1.1) / .5), a2 = Math.max(0, Math.min(1, (ic - 3.6) / .6));
+    ctx.globalAlpha = a1; ctx.fillStyle = 'rgba(13,4,32,.78)'; rr(C - R * .7, ty - R * .2, R * 1.4, R * .3, R * .08); ctx.fill();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff3f5';
+    ctx.font = `800 ${Math.round(R * .12)}px Archivo, sans-serif`; ctx.fillText('Zusammenstoss!', C, ty - R * .1 + (1 - a1) * R * .04);
+    ctx.globalAlpha = a2; ctx.font = `700 ${Math.round(R * .065)}px Manrope, sans-serif`; ctx.fillText('24 Päckli schweben im All.', C, ty + R * .01);
+    ctx.globalAlpha = 1;
+  }
+  if (ic > CRASH_T) endIntro();
+}
+
+/* ---------- drawing a frame ---------- */
+// e: how far the crash has scattered everything (1 = in place); pk: the same for each Päckli, during the crash
+function scene(e, t, pk) {
+  const ps = Math.max(7, R * .042), K = pk || (() => e), wob = reduce ? 0 : 1;
+  const de = Math.min(1, e * 1.6);   // the splinters are light and fly faster
+  if (e > 0) DEBRIS.forEach((d, i) => {
+    const fx = IMP[0] + Math.cos(d.a) * d.d, fy = IMP[1] + Math.sin(d.a) * d.d * .55;
+    drawBit(X(lerp(IMP[0], fx, de) + wob * Math.sin(t * .35 + i) * .015), X(lerp(IMP[1], fy, de) + wob * Math.cos(t * .3 + i * 1.3) * .015), R * .075, d, t * d.spin * .2 + de * d.spin * 3);
+  });
+  DEC.forEach((d, i) => {
+    const o = d.kind === 'sat' ? ORIG_SAT : ORIG_DEER(i);
+    const bx = lerp(o[0], d.x, e) + wob * Math.sin(t * .5 + d.ph) * .02, by = lerp(o[1], d.y, e) + wob * Math.cos(t * .4 + d.ph) * .02;
+    if (d.kind === 'sat') drawSat(X(bx), X(by), R * .075, t * d.spin + e * 4, t, true);
+    else drawDeer(X(bx), X(by), R * .075, Math.sin(t * .3 + d.ph) * .5 + t * d.spin * .3 + (1 - e) * 3, t, true);
+  });
+  const [ex, ey] = eselPos(), ex0 = caught.has(24) ? ex : lerp(ORIG_ESEL[0], ex, e), ey0 = caught.has(24) ? ey : lerp(ORIG_ESEL[1], ey, e);
+  if (!inNet(24)) {
+    if (caught.has(24)) drawEsel(X(ex), X(ey), R * .07, 0, false);
+    else drawEsel(X(ex0), X(ey0), R * .07, reduce ? 0 : Math.sin(t * .4) * .3 + .2 + (pk ? Math.sin(t * 9) * .06 * (1 - e) : 0), true);
+  }
+  // the Päckli come out of the sack on the Esel's back
+  const sx0 = ex0 + .1, sy0 = ey0 + .03;
+  for (const p of P) {
+    const k = K(p.n); if (k <= 0) continue;
+    const px = lerp(sx0, Math.cos(p.a) * p.r, k), py = lerp(sy0, Math.sin(p.a) * p.r, k);
+    if (caught.has(p.n) || inNet(p.n)) { drawMiniStar(X(px), X(py), Math.max(4, R * .028), p, t); continue; }
+    const bob = reduce ? 0 : Math.sin(t * .9 + p.n) * .008;
+    drawPkg(X(px), X(py + bob), ps, p, isLocked(p.n), t, (1 - k) * 8);
+    if (pk && k < .35) { ctx.strokeStyle = hexA(p.col, .8 * (1 - k / .35)); ctx.lineWidth = 1.5; ctx.beginPath(); ctx.arc(X(sx0), X(sy0), R * (.03 + .16 * k), 0, 7); ctx.stroke(); }
+  }
+}
+
+function frame(now) {
+  inDraw = true; draw(now); inDraw = false;
+  if (redo) { redo = false; draw(now); }
+  requestAnimationFrame(frame);
+}
+function draw(now) {
+  const dt = Math.min(.05, (now - (frame.last || now)) / 1000); frame.last = now; clock += dt;
+  const t = clock;
+  frame.n = (frame.n || 0) + 1;
+  if (skyDirty || shoot || frame.n % 3 === 0 || t > nextShoot) { skyDirty = false; drawBg(t); }   // the slow sky needs only every third frame
+  ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.clearRect(0, 0, cv.width, cv.height);
+  ctx.setTransform(dpr, 0, 0, dpr, OX * dpr, OY * dpr);
+  const cs = R * .15;
+
+  if (state === 'teaser') { drawTeaser(t, cs); return; }
+
+  if (state === 'intro') {
+    let it = t - intro.t0;
+    if (intro.title && it < TITLE_T) { drawTitle(it); return; }
+    if (intro.title) it -= TITLE_T;
+    if (it < FLY_T) drawApproach(it / FLY_T, t, cs);
+    else drawCrash(it - FLY_T, t, cs);
+    return;
+  }
+
+  if (state === 'finale') drawConstellation(Math.min(1, (t - finale.t0) / 2.2), t, true);
+  else if (caught.has(24)) drawConstellation(1, t, false);
+  scene(1, t);
+
+  // aim line and target
+  if (state === 'charge' || (state === 'idle' && pointerIn)) {
+    ctx.save(); ctx.setLineDash([4, 7]); stroke('rgba(212,247,122,.45)', 1.5, [[X(Math.cos(aim) * .22), X(Math.sin(aim) * .22), X(Math.cos(aim) * 1.12), X(Math.sin(aim) * 1.12)]]); ctx.restore();
+    hv = pick(aim, hv); showTarget(hv);
+    if (hv) {
+      let px, py, rad = R * .11;
+      if (hv.n === 24) { const [ex, ey] = eselPos(); px = X(ex); py = X(ey); rad = R * .15; } else { const p = P[hv.n - 1]; px = X(Math.cos(p.a) * p.r); py = X(Math.sin(p.a) * p.r); }
+      ctx.save(); ctx.setLineDash([5, 5]); ctx.lineDashOffset = -t * 20; ctx.strokeStyle = hv.locked ? 'rgba(255,243,245,.45)' : '#d4f77a'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(px, py, rad, 0, 7); ctx.stroke(); ctx.restore();
+    }
+  }
+
+  // charging: the clock runs for half a second, then you are blind; the net swings at an uneven pace so it can't be counted
+  let charge = 0;
+  if (state === 'charge') {
+    charge = (performance.now() - t0) / 1000;
+    swingV = Math.min(16, swingV + dt * (1.2 + Math.sin(t * 2.7) * 2.2 + Math.random() * 1.5));
+    swing += swingV * dt * (.75 + .5 * Math.sin(t * 3.3 + Math.cos(t * 1.9)));
+    const helpNow = hv && !hv.locked && hasHelp(hv.n);
+    if (helpNow) { clockEl.className = 'clock ' + (charge > hv.T ? 'over' : 'help'); clockEl.textContent = fmt(charge, 2) + ' s'; }
+    else if (charge < BLIND_AFTER) { clockEl.className = 'clock'; clockEl.textContent = fmt(charge, 2) + ' s'; }
+    else if (!clockEl.classList.contains('blind')) { clockEl.className = 'clock blind'; clockEl.textContent = 'blind zählen'; }
+  }
+  drawChlaus(X(0), X(0), cs, t, charge, swing, state === 'idle');
+  if (caught.has(24) && !inNet(24)) { ctx.fillStyle = '#b98a4e'; ell(X(.2), X(.17), cs * .38, cs * .45, 0, '#b98a4e'); ell(X(.2), X(.17) - cs * .45, cs * .18, cs * .07, 0, '#ffd36b'); }
+
+  // the flying net
+  if (fly) {
+    fly.u += dt / fly.dur;
+    const [hx, hy] = handPx(), lx = X(Math.cos(fly.a) * fly.ru), ly = X(Math.sin(fly.a) * fly.ru), NR = Math.max(12, R * .1);
+    let x, y, r;
+    if (state === 'fly') { const k = easeOut(Math.min(1, fly.u)); x = lerp(hx, lx, k); y = lerp(hy, ly, k); r = lerp(4, NR, k); }
+    else { const k = easeIO(Math.min(1, fly.u)); x = lerp(lx, hx, k); y = lerp(ly, hy, k); r = lerp(NR, NR * .6, k); }
+    const mx = (hx + x) / 2 - (y - hy) * .12, my = (hy + y) / 2 + (x - hx) * .12;
+    ctx.strokeStyle = 'rgba(255,243,245,.7)'; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(hx, hy); ctx.quadraticCurveTo(mx, my, x, y); ctx.stroke();
+    if (state === 'back' && fly.item) {
+      if (fly.item.n === 24) drawEsel(x, y, R * .055, .3, true);
+      else if (fly.item.n) drawPkg(x, y, Math.max(6, R * .036), P[fly.item.n - 1], false, t);
+      else { ell(x, y, r * .3, r * .22, t, '#c9a26b'); star4(x + r * .2, y - r * .2, r * .15, '#ffd36b'); }
+    }
+    drawNet(x, y, r);
+    if (fly.u >= 1) { if (state === 'fly') resolve(); else landed(); }
+  }
+
+  // finale on the 24th: the sack is back, all Päckli light up as one star
+  if (state === 'finale') {
+    const k = (t - finale.t0) / 3.2;
+    ctx.save(); ctx.translate(C, C); ctx.rotate(t * .4);
+    const RL = Math.max(W, H); for (let i = 0; i < 12; i++) { ctx.rotate(Math.PI / 6); ctx.fillStyle = `rgba(255,211,107,${.18 * Math.sin(Math.min(1, k) * Math.PI)})`; ctx.beginPath(); ctx.moveTo(0, 0); ctx.lineTo(RL, -RL * .08); ctx.lineTo(RL, RL * .08); ctx.closePath(); ctx.fill(); }
+    ctx.restore();
+    ctx.globalAlpha = Math.min(1, k * 2); ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillStyle = '#fff3f5';
+    ctx.font = `800 ${Math.round(R * .12)}px Archivo, sans-serif`; ctx.fillText('Der Sack ist zurück!', C, TY()); ctx.globalAlpha = 1;
+    if (k >= 1) { state = 'idle'; finale = null; openPkg(24); }
+  }
+}
+
+/* ---------- input ---------- */
+function aimAt(e) {
+  const b = cv.getBoundingClientRect(), x = (e.clientX - b.left) - b.width / 2, y = (e.clientY - b.top) - b.height / 2;
+  if (Math.hypot(x, y) > Math.min(b.width, b.height) * .06) aim = Math.atan2(y, x);
+}
+stage.addEventListener('pointerdown', e => {
+  if (e.button > 0 || view !== 'game') return;
+  e.preventDefault(); stage.focus({ preventScroll: true });
+  pid = e.pointerId; aimAt(e); try { stage.setPointerCapture(pid); } catch (err) {}
+  if (!ac && $('#sound').checked) beep(1, .01, 'sine', .0001);
+  startCharge();
+});
+stage.addEventListener('pointermove', e => { if (state === 'charge' && e.pointerId !== pid) return; aimAt(e); });
+stage.addEventListener('pointerenter', e => { if (e.pointerType === 'mouse') pointerIn = true; });
+stage.addEventListener('pointerleave', () => { pointerIn = false; });
+const up = e => { if (e.pointerId !== pid) return; pid = null; release(); };
+stage.addEventListener('pointerup', up); stage.addEventListener('pointercancel', up);
+stage.addEventListener('contextmenu', e => e.preventDefault());
+stage.addEventListener('keydown', e => {
+  if (view !== 'game') return;
+  if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); if (!e.repeat) { pointerIn = true; startCharge(); } }
+  else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); pointerIn = true; aim -= .07; }
+  else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); pointerIn = true; aim += .07; }
+});
+stage.addEventListener('keyup', e => { if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); release(); } });
+stage.addEventListener('blur', () => { if (state === 'charge' && pid == null) release(); });
+
+/* ---------- the sack, switches ---------- */
+function renderChips() {
+  const box = $('#chips'); box.innerHTML = '';
+  for (let n = 1; n <= 24; n++) {
+    const b = document.createElement('button'); b.type = 'button'; b.textContent = n;
+    const got = caught.has(n);
+    b.className = 'chip' + (got ? ' got' : '') + (n === 24 ? ' esel' : '');
+    if (got) { b.style.setProperty('--c', n === 24 ? '#d4f77a' : P[n - 1].col); b.setAttribute('aria-label', `${n === 24 ? 'Esel mit Sack' : 'Päckli ' + n}${scores[n] != null ? ', ' + scores[n] + ' Punkte' : ''}: Frage ansehen`); if (scores[n] != null) b.title = `${scores[n]} Punkte`; b.addEventListener('click', () => openPkg(n)); }
+    else { b.disabled = true; b.setAttribute('aria-label', `${n === 24 ? 'Esel mit Sack' : 'Päckli ' + n}: noch im All`); }
+    box.appendChild(b);
+  }
+  const a = Object.keys(answers).filter(k => (answers[k] || '').trim()).length;
+  $('#count').textContent = `${caught.size} von 24 gefangen · ${a} beantwortet`;
+  const sc = $('#score'), tot = total(); sc.innerHTML = '';
+  const s1 = document.createElement('span'), b1 = document.createElement('b'); b1.textContent = tot; s1.append(b1, ` von ${24 * MAX_PTS} Punkten`); sc.append(s1);
+  if (best > tot) { const s2 = document.createElement('span'); s2.textContent = `Bestwert: ${best}`; sc.append(s2); }
+}
+renderChips();
+$('#real').addEventListener('change', () => { lastTarget = ''; if ($('#real').checked && !realDay) say('Der Advent beginnt am 1. Dezember. Bis dahin schlafen alle Päckli.', 'bad'); else say(''); });
+$('#replay').addEventListener('click', () => { if (state === 'idle') startIntro(false); });
+let resetArm = 0;
+$('#reset').addEventListener('click', () => {
+  const b = $('#reset');
+  if (!resetArm) { resetArm = setTimeout(() => { resetArm = 0; b.textContent = 'Neu anfangen'; b.classList.remove('warn'); }, 4000); b.textContent = 'Wirklich alles löschen?'; b.classList.add('warn'); return; }
+  clearTimeout(resetArm); resetArm = 0; b.textContent = 'Neu anfangen'; b.classList.remove('warn');
+  caught = new Set(); answers = {}; scores = {}; misses = {}; for (const k in born) delete born[k]; save(); renderChips(); say('Alle Päckli schweben wieder im All, deine Antworten und Punkte sind gelöscht.' + (best ? ` Dein Bestwert von ${best} Punkten bleibt.` : ''));
+});
+
+/* ---------- dialog ---------- */
+const modal = $('#modal'); let cur = 0, lastFocus = null;
+function showModal() { lastFocus = document.activeElement; modal.hidden = false; $('#panel').focus(); }
+function openPkg(n) {
+  cur = n; $('#reveal').hidden = false; $('#summary').hidden = true;
+  $('#pEye').textContent = n === 24 ? `Der Esel mit dem Sack · ${long(24)}` : `Päckli ${n} · ${long(n)}`;
+  $('#qText').textContent = FRAGEN[n - 1]; $('#ans').value = answers[n] || '';
+  $('#toSum').hidden = n !== 24;
+  showModal();
+}
+function closeModal() { modal.hidden = true; if (lastFocus && lastFocus.focus) lastFocus.focus({ preventScroll: true }); }
+function openSummary() {
+  $('#reveal').hidden = true; $('#summary').hidden = false; $('#pEye').textContent = 'Dein Advent in Antworten';
+  const have = [...caught].sort((a, b) => a - b), n = have.filter(k => (answers[k] || '').trim()).length;
+  $('#sumInfo').textContent = have.length
+    ? `${have.length} von 24 Päckli gefangen, ${n} ${n === 1 ? 'Frage' : 'Fragen'} beantwortet · ${total()} von ${24 * MAX_PTS} Punkten.`
+    : 'Noch kein Päckli gefangen. Sobald du eines hast, steht seine Frage hier.';
+  const list = $('#sumList'); list.innerHTML = '';
+  for (const k of have) {
+    const li = document.createElement('li'), a = (answers[k] || '').trim();
+    const sn = document.createElement('span'); sn.className = 'sn'; sn.textContent = k === 24 ? 'Der Esel mit dem Sack' : `Päckli ${k}`;
+    const sq = document.createElement('p'); sq.className = 'sq'; sq.textContent = FRAGEN[k - 1];
+    const sa = document.createElement('p'); sa.className = 'sa' + (a ? '' : ' empty'); sa.textContent = a || 'noch keine Antwort';
+    li.append(sn, sq, sa); list.appendChild(li);
+  }
+  $('#copyAns').hidden = !have.length;
+  if (modal.hidden) showModal();
+}
+$('#saveAns').addEventListener('click', () => {
+  const t = $('#ans').value.trim();
+  if (t) answers[cur] = t; else delete answers[cur];
+  save(); renderChips(); beep(880, .12, 'triangle');
+  say(t ? `Antwort in ${cur === 24 ? 'den Sack' : 'Päckli ' + cur} gespeichert.` : 'Antwort gelöscht.', 'good');
+  if (cur === 24 && t) openSummary(); else closeModal();
+});
+$('#toSum').addEventListener('click', openSummary);
+$('#openSum').addEventListener('click', openSummary);
+$('#close').addEventListener('click', closeModal); $('#back').addEventListener('click', closeModal); $('#back2').addEventListener('click', closeModal);
+modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+modal.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+$('#copyAns').addEventListener('click', () => {
+  const txt = ['Mein Advent in Antworten · Samichlaus im All · Fragerei 2026', `${caught.size} von 24 Päckli gefangen · ${total()} von ${24 * MAX_PTS} Punkten`, ''].concat([...caught].sort((a, b) => a - b).map(k => `${k === 24 ? 'Der Esel mit dem Sack' : 'Päckli ' + k}: ${FRAGEN[k - 1]}\n${(answers[k] || '').trim() || '–'}\n`)).join('\n');
+  try { const pr = navigator.clipboard && navigator.clipboard.writeText(txt); if (!pr) throw 0; pr.then(() => say('Alle Antworten kopiert.', 'good'), () => say('Kopieren ging nicht.', 'bad')); } catch (e) { say('Kopieren ging nicht.', 'bad'); }
+});
+
+/* ---------- only as a gift ----------
+   Without a gift link you see the Fragerei Adventszeit and the form to give it away; a gift link opens it.
+   Gift links: #geschenk-<names>-<check>, the same format as in the Fragewürfel and the Sternbild. */
+// where gift links point. Test phase: this page. On the website: the calendar's address there
+const LINK_BASE = 'https://fragen.fragerei.ch/advent.html';
+const STORE = 'samichlaus-im-all-geschenk';
+// Kollekte: the TWINT payment link (TWINT Business app); amount and purpose are prefilled via &amount= and &trxInfo=, as in TWINT's paylink guide
+const TWINT = 'https://go.twint.ch/1/e/tw?tw=acq.hs-KVk0fR-S8Duu-QljIhXgw7C63-iwBUR2zBBjfzwQGUoRPISMdxPoNu9N-ss_5.';
+const KOLLEKTE_ZWECK = 'Fragerei Advent Kollekte';
+
+const B32 = 'abcdefghijklmnopqrstuvwxyz234567';
+function b32(bytes) {
+  let out = '', val = 0, bits = 0;
+  for (const b of bytes) { val = (val << 8) | b; bits += 8; while (bits >= 5) { out += B32[(val >>> (bits - 5)) & 31]; bits -= 5; } val &= (1 << bits) - 1; }
+  if (bits) out += B32[(val << (5 - bits)) & 31];
+  return out;
+}
+function unb32(s) {
+  const out = []; let val = 0, bits = 0;
+  for (const c of s) { const i = B32.indexOf(c); if (i < 0) return null; val = (val << 5) | i; bits += 5; if (bits >= 8) { out.push((val >>> (bits - 8)) & 255); bits -= 8; } val &= (1 << bits) - 1; }
+  return new Uint8Array(out);
+}
+function check(s) { let h = 0x811c9dc5; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return b32([h >>> 24, (h >>> 16) & 255]).slice(0, 3); }
+const clean = s => (s || '').replace(/\s+/g, ' ').trim().slice(0, 30);
+function makeCode(f, v) { const data = b32(new TextEncoder().encode(clean(f) + '\n' + clean(v))); return `geschenk-${data}-${check(data)}`; }
+function readCode(code) {
+  const m = /^geschenk-([a-z2-7]+)-([a-z2-7]{3})$/.exec(code.toLowerCase());
+  if (!m || check(m[1]) !== m[2]) return null;
+  try {
+    const bytes = unb32(m[1]); if (!bytes) return null;
+    const [f, v] = new TextDecoder('utf-8', { fatal: true }).decode(bytes).split('\n');
+    return clean(f) ? { code: m[0], f: clean(f), v: clean(v) } : null;
+  } catch (e) { return null; }
+}
+const giftUrl = (f, v) => `${LINK_BASE}#${makeCode(f, v)}`;
+function loadGift() { try { const g = JSON.parse(localStorage.getItem(STORE) || 'null'); return g && g.code && readCode(g.code) ? g : null; } catch (e) { return null; } }
+function saveGift(g) { try { if (g) localStorage.setItem(STORE, JSON.stringify(g)); else localStorage.removeItem(STORE); } catch (e) {} }
+
+let toastT = 0;
+function toast(m) { const el = $('#toast'); el.textContent = m; el.classList.add('on'); clearTimeout(toastT); toastT = setTimeout(() => el.classList.remove('on'), 2800); }
+
+function setTitle(pre, name) { const h = $('#title'); h.textContent = pre; const sp = document.createElement('span'); sp.textContent = name; h.append(sp); }
+function show() {
+  const g = who(), game = view === 'game';
+  $('#eyebrow').textContent = game && g ? `Für ${g.f}${g.v ? ` · von ${g.v}` : ''}` : 'Advent 2026 · 24 Päckli · 24 Fragen';
+  if (game) setTitle('Samichlaus ', 'im All'); else setTitle('Fragerei ', 'Adventszeit');
+  $('#lead').hidden = !game; $('#leadGate').hidden = game; $('#steps').hidden = !game;
+  $('#hud').hidden = !game; statusEl.hidden = !game; $('#sackBox').hidden = !game;
+  $('#gotLink').hidden = game; $('#forget').hidden = !game || preview;
+  stage.classList.toggle('teaser', !game);
+  stage.setAttribute('aria-label', game ? 'Spielfeld. Zielen mit Maus, Finger oder Pfeiltasten. Halten mit Finger, Maustaste oder Leertaste, blind loslassen.' : 'Der Samichlaus fliegt mit seinen Rentieren durchs All.');
+  stage.tabIndex = game ? 0 : -1;
+  $('#h-give').textContent = game ? 'Weiterschenken' : 'Verschenken';
+  $('#giveSub').textContent = game
+    ? 'Schenk den Kalender weiter. Jede Person bekommt ihren eigenen Link mit ihrem Namen. Gratis.'
+    : 'Gib ein, für wen er ist. Du bekommst einen persönlichen Link, den du verschickst. Verschenken und Bekommen sind gratis.';
+}
+function setView(v, withIntro) {
+  exitFull(); view = v; fly = null; finale = null; show();
+  if (v !== 'game') { state = 'teaser'; intro = null; return; }
+  if (withIntro) startIntro(true);
+  else { state = 'idle'; intro = null; say(caught.size ? '' : 'Such dir ein leuchtendes Päckli aus. Halte in seine Richtung und lass blind los.'); }
+}
+function route() {
+  if (!modal.hidden) closeModal();
+  let h = ''; try { h = decodeURIComponent(location.hash.slice(1)); } catch (e) { h = location.hash.slice(1); }
+  preview = h === 'vorschau';
+  let bad = false;
+  if (/^geschenk-/i.test(h)) {
+    const g = readCode(h);
+    if (g) { const s = loadGift(); gift = { ...g, opened: !!(s && s.code === g.code && s.opened) }; saveGift(gift); }
+    else { bad = true; gift = null; }
+  } else gift = preview ? null : loadGift();
+  $('#notice').hidden = !bad; $('#preview').hidden = !preview;
+  document.body.classList.toggle('pv', preview);
+  if (preview) { setPvView(pvView); return; }
+  setView(gift ? 'game' : 'gate', !!gift && !gift.opened);
+}
+$('#forget').addEventListener('click', () => {
+  saveGift(null); gift = null;
+  if (/^#geschenk-/i.test(location.hash)) history.replaceState(null, '', location.pathname + location.search);
+  setView('gate'); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); toast('Vergessen. Mit dem Link geht der Kalender wieder auf.');
+});
+
+/* giving */
+let made = null;
+function message(m) {
+  return `${m.f}, ich schenke dir einen Adventskalender von der Fragerei: Der Samichlaus ist mit einem Satelliten zusammengestossen, 24 Päckli schweben im All. Vom 1. bis 24. Dezember fängst du jeden Tag eines ein, in jedem wartet eine Frage. Hier geht es los:\n${m.url}`;
+}
+function makeLink() { const f = clean($('#fuer').value), v = clean($('#von').value); return f ? { f, v, url: giftUrl(f, v) } : null; }
+function showMade() {
+  $('#done').hidden = !made;
+  if (!made) return;
+  $('#doneT').textContent = `Fertig. Schick diesen Link an ${made.f}:`;
+  $('#giveLink').textContent = made.url;
+  $('#wa').href = 'https://wa.me/?text=' + encodeURIComponent(message(made));
+}
+$('#giveForm').addEventListener('submit', e => {
+  e.preventDefault();
+  made = makeLink();
+  $('#fuerErr').hidden = !!made;
+  $('#fuer').setAttribute('aria-invalid', made ? 'false' : 'true');
+  showMade();
+  if (!made) { $('#fuer').focus(); return; }
+  toast(`Geschenk-Link für ${made.f} ist bereit.`);
+});
+$('#giveForm').addEventListener('input', () => {
+  if (clean($('#fuer').value)) { $('#fuerErr').hidden = true; $('#fuer').setAttribute('aria-invalid', 'false'); }
+  if (made) { made = makeLink(); showMade(); }
+});
+function selectLink() { try { const r = document.createRange(); r.selectNodeContents($('#giveLink')); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); } catch (e) {} }
+function copy(text, ok) {
+  const fail = () => { selectLink(); toast('Kopieren ging nicht. Der Link ist markiert, kopier ihn selbst.'); };
+  try { const pr = navigator.clipboard && navigator.clipboard.writeText(text); if (!pr) throw 0; pr.then(() => toast(ok), fail); } catch (e) { fail(); }
+}
+$('#copyLink').addEventListener('click', () => made && copy(made.url, `Link für ${made.f} kopiert.`));
+$('#copyMsg').addEventListener('click', () => made && copy(message(made), `Nachricht für ${made.f} kopiert.`));
+
+/* Kollekte: voluntary; the chosen amount goes into the TWINT link */
+let amount = 5;
+function kollekte() {
+  const own = amount === 'own', v = own ? Math.round(Number($('#amt').value)) : amount, ok = v >= 1 && v <= 1000;
+  document.querySelectorAll('.amt').forEach(b => b.setAttribute('aria-pressed', String(String(amount) === b.dataset.amt)));
+  $('#ownAmt').hidden = !own;
+  const a = $('#kollekte');
+  if (ok) { a.href = `${TWINT}&amount=${v}.00&trxInfo=${encodeURIComponent(KOLLEKTE_ZWECK)}`; a.className = 'btn'; a.textContent = `CHF ${v} mit TWINT geben`; a.removeAttribute('aria-disabled'); }
+  else { a.removeAttribute('href'); a.className = 'btn off'; a.textContent = 'Betrag eingeben'; a.setAttribute('aria-disabled', 'true'); }
+}
+document.querySelectorAll('.amt').forEach(b => b.addEventListener('click', () => { amount = b.dataset.amt === 'own' ? 'own' : Number(b.dataset.amt); kollekte(); if (amount === 'own') $('#amt').focus(); }));
+$('#amt').addEventListener('input', kollekte);
+kollekte();
+
+/* preview for the collective: open the page with #vorschau */
+function setPvView(v) {
+  pvView = v;
+  document.querySelectorAll('.seg button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === v)));
+  setView(v, v === 'game');
+}
+document.querySelectorAll('.seg button').forEach(b => b.addEventListener('click', () => { setPvView(b.dataset.view); scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }); }));
+$('#skip').addEventListener('click', () => { if (state === 'intro') endIntro(); });
+addEventListener('hashchange', route);
+route();
+ready = true;
+requestAnimationFrame(frame);
+})();
+</script>
+</body>
+</html>
