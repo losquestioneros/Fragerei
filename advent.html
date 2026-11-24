@@ -180,7 +180,6 @@ body.introing .wrap{z-index:auto}
     <div class="chips" id="chips"></div>
     <p class="note">Jedes gefangene Päckli lässt einen Stern in seiner Farbe im All zurück. Am 24. Dezember fängst du den Esel mit dem Sack ein, dann verbinden sich alle Sterne zu einem grossen Stern. Je knapper vor der Zeit du loslässt, desto mehr Punkte, höchstens 100 pro Päckli. Nach drei Fehlwürfen auf dasselbe Päckli bleibt die Uhr beim nächsten Wurf sichtbar. Tipp auf ein gefangenes Päckli, um seine Frage nochmals zu lesen.</p>
     <div class="row">
-      <label class="switch"><input type="checkbox" id="real"> Echter Advent: Päckli erst an ihrem Tag</label>
       <label class="switch"><input type="checkbox" id="sound" checked> Ton</label>
     </div>
     <div class="acts">
@@ -254,7 +253,7 @@ body.introing .wrap{z-index:auto}
 
 <div class="preview" id="preview" hidden>
   <div class="wrap">
-    <p>Vorschau fürs Kollektiv</p>
+    <p>Vorschau fürs Kollektiv · hier sind alle Päckli offen, zum Ausprobieren</p>
     <div class="seg" role="group" aria-label="Ansicht">
       <button type="button" data-view="gate" aria-pressed="false">Ohne Link</button>
       <button type="button" data-view="game" aria-pressed="false">Mit Geschenk-Link</button>
@@ -348,7 +347,22 @@ try { scores = JSON.parse(localStorage.getItem(K4) || '{}') || {}; misses = JSON
 const total = () => Object.values(scores).reduce((a, b) => a + (+b || 0), 0);
 const hasHelp = n => (misses[n] || 0) >= HELP_AFTER;
 const save = () => { try { localStorage.setItem(K1, JSON.stringify([...caught])); localStorage.setItem(K2, JSON.stringify(answers)); localStorage.setItem(K4, JSON.stringify(scores)); localStorage.setItem(K5, JSON.stringify(misses)); localStorage.setItem(K6, String(best)); } catch (e) {} };
-const isLocked = n => $('#real').checked && n > realDay;
+// Päckli n wakes up on n December (Esel on the 24th); missed days can be caught up later. Only the #vorschau for the collective opens all of them.
+const isLocked = n => !preview && n > realDay;
+// catches made before their day (e.g. while testing in the Vorschau) are taken back; answers stay
+function prune() {
+  if (preview) return;
+  let ch = false;
+  for (const n of [...caught]) if (n > realDay) { caught.delete(n); delete scores[n]; ch = true; }
+  for (const n of Object.keys(misses)) if (+n > realDay) { delete misses[n]; ch = true; }
+  if (ch) { best = Math.min(best, total()); save(); renderChips(); }
+}
+const startMsg = () => {
+  if (!preview && !realDay) return 'Der Advent beginnt am 1. Dezember. Bis dahin schlafen alle Päckli.';
+  if (!caught.size) return 'Such dir ein leuchtendes Päckli aus. Halte in seine Richtung und lass blind los.';
+  if (!preview && realDay < 24 && P.every(p => p.n > realDay || caught.has(p.n))) return 'Dein Päckli für heute hast du schon. Morgen wacht das nächste auf.';
+  return '';
+};
 
 /* ---------- sound ---------- */
 let ac = null;
@@ -626,7 +640,7 @@ function exitFull() {
   void stage.offsetWidth; stage.classList.add('settle'); setTimeout(() => stage.classList.remove('settle'), 800);
 }
 function startIntro(title) { if (reduce) { endIntro(); return; } enterFull(); state = 'intro'; intro = { t0: clock, title: !!title, boom: false, pops: 0 }; fly = null; }
-function endIntro() { exitFull(); state = 'idle'; intro = null; seenIntro = true; try { localStorage.setItem(K3, '1'); } catch (e) {} if (gift && !gift.opened) { gift.opened = true; saveGift(gift); } say(caught.size ? '' : 'Such dir ein leuchtendes Päckli aus. Halte in seine Richtung und lass blind los.'); }
+function endIntro() { exitFull(); state = 'idle'; intro = null; seenIntro = true; try { localStorage.setItem(K3, '1'); } catch (e) {} if (gift && !gift.opened) { gift.opened = true; saveGift(gift); } say(startMsg()); }
 
 /* ---------- stars left behind by caught Päckli ---------- */
 const born = {};   // when each star appeared, for its sparkle
@@ -935,7 +949,6 @@ function renderChips() {
   if (best > tot) { const s2 = document.createElement('span'); s2.textContent = `Bestwert: ${best}`; sc.append(s2); }
 }
 renderChips();
-$('#real').addEventListener('change', () => { lastTarget = ''; if ($('#real').checked && !realDay) say('Der Advent beginnt am 1. Dezember. Bis dahin schlafen alle Päckli.', 'bad'); else say(''); });
 $('#replay').addEventListener('click', () => { if (state === 'idle') startIntro(false); });
 let resetArm = 0;
 $('#reset').addEventListener('click', () => {
@@ -997,7 +1010,7 @@ $('#copyAns').addEventListener('click', () => {
 const LINK_BASE = 'https://fragen.fragerei.ch/advent.html';
 const STORE = 'samichlaus-im-all-geschenk';
 // Kollekte: the TWINT payment link (TWINT Business app); amount and purpose are prefilled via &amount= and &trxInfo=, as in TWINT's paylink guide
-const TWINT = 'https://go.twint.ch/1/e/tw?tw=acq.hs-KVk0fR-S8Duu-QljIhXgw7C63-iwBUR2zBBjfzwQGUoRPISMdxPoNu9N-ss_5.';
+const TWINT = 'https://go.twint.ch/1/e/tw?tw=acq.j053qfoNSCK9eB796NHPUiG3bblmfaw5DfS7ZDihY0yWaDoecTL83iEeSb99o6Js.';
 const KOLLEKTE_ZWECK = 'Fragerei Advent Kollekte';
 
 const B32 = 'abcdefghijklmnopqrstuvwxyz234567';
@@ -1051,7 +1064,7 @@ function setView(v, withIntro) {
   exitFull(); view = v; fly = null; finale = null; show();
   if (v !== 'game') { state = 'teaser'; intro = null; return; }
   if (withIntro) startIntro(true);
-  else { state = 'idle'; intro = null; say(caught.size ? '' : 'Such dir ein leuchtendes Päckli aus. Halte in seine Richtung und lass blind los.'); }
+  else { state = 'idle'; intro = null; say(startMsg()); }
 }
 function route() {
   if (!modal.hidden) closeModal();
@@ -1065,7 +1078,9 @@ function route() {
   } else gift = preview ? null : loadGift();
   $('#notice').hidden = !bad; $('#preview').hidden = !preview;
   document.body.classList.toggle('pv', preview);
+  lastTarget = '';
   if (preview) { setPvView(pvView); return; }
+  prune();
   setView(gift ? 'game' : 'gate', !!gift && !gift.opened);
 }
 $('#forget').addEventListener('click', () => {
